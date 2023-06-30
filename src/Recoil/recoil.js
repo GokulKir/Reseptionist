@@ -23,3 +23,8 @@ export const Selection = atom({
   key: 'selectionState',
   default: [0],
 })
+
+export const Question = atom({
+  key : 'questionState',
+  default : '' ,
+})
