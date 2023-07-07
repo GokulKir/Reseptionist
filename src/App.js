@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import Talk from './Components/Pages/Talk';
 import Responce from './Components/Pages/Responce';
 import NotRes from './Components/Pages/NotRes';
+import Conditions from './Components/Pages/Conditions';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   RecoilRoot,
@@ -24,6 +25,8 @@ export default function App() {
           <Route path="Responce" element={<Responce />}>
           </Route>
           <Route path='NotRes' element={<NotRes />}>
+          </Route>
+          <Route path='Conditions' element={<Conditions />}>
           </Route>
         </Routes>
       </RecoilRoot>

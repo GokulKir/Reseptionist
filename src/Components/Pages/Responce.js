@@ -13,11 +13,13 @@ import {
   useRecoilState,
   useRecoilValue,
 } from 'recoil';
-import { VoiceAssist, VoiceData, Selection, Question } from '../../Recoil/recoil';
+import { VoiceAssist, VoiceData,  Question } from '../../Recoil/recoil';
 import { Icon } from '@iconify/react';
 import MovingText from 'react-moving-text'
 import { useFaceDetection } from 'react-use-face-detection';
 import Swal from 'sweetalert2'
+
+
 
 
 
@@ -28,10 +30,10 @@ function Responce() {
   const [Timesp, setTimeSp] = useState('what is the purpose of your visit?')
   const [AllVoice, setAllVoice] = useRecoilState(VoiceAssist)
   const [Voicedata, setVoicedata] = useRecoilState(VoiceData)
-  const [selection, setSelection] = useRecoilState(Selection)
   const [Talk , setTalk] = useState('')
   const [Typed , setTyped] = useState()
   const [Qa, setQa] = useRecoilState(Question)
+  const [condition , setcondition] = useState('Check the condition')
   const navigate = useNavigate()
   const speech = new Speech()
   const id  = useId()
@@ -46,7 +48,7 @@ function Responce() {
       icon: 'info',
       confirmButtonText: 'Yes',
       confirmButtonColor: '#FB8C00',
-      iconColor: '#FB8C00',
+      iconColor: '#22c2e6',
       showCancelButton: true,
       cancelButtonText: 'No',
       cancelButtonColor: '#757575',
@@ -58,8 +60,10 @@ function Responce() {
     }).then((result) => {
       if (result.isConfirmed) {
          console.log("Is conformed");
+         navigate('/Conditions')
       } else if (result.dismiss === Swal.DismissReason.cancel) {
            console.log("Is Rejected");
+           navigate('/NotRes')
       }
     });
   }
@@ -70,8 +74,7 @@ function Responce() {
     console.log("This is voice" + transcript);
     setTalk(transcript)
 
-    setVoicedata(transcript)
-    setQa(transcript)
+  
   }
 
 
@@ -122,14 +125,43 @@ function Responce() {
     )
   }
 
+
   const startListening = async () => {
+    
 
     await SpeechRecognition.startListening();
     console.log(transcript);
+    setTalk(transcript)
 
     console.log("Hello", transcript);
 
+    const text = 'meet a person' 
+
+    if (transcript === text) {
+
+      console.log("Meet sheduled")
+
+
+      const confirmed = new SpeechSynthesisUtterance(condition);
+      window.speechSynthesis.speak(confirmed);
+
+      setcondition('')
+
+      AlertBox()
+
+    
+      
+    }
+
   }
+
+
+
+  useEffect(()=>{
+
+    startListening()
+
+  },[startListening])
 
 
   useEffect(() => {
@@ -158,48 +190,68 @@ function Responce() {
 
   }, []);
 
-  useEffect(() => {
-    console.log("Position number", selection);
 
-    Assist()
-    console.log("Speak data", Voicedata);
-    console.log("Qa", Qa);
-
-  console.log("This is input data",Typed);
-  setTalk(Typed);
-
-
-
-  }, [Assist])
-
-  const TypedData = () => {
-    console.log('Typed data',Typed);
-    navigate('/NotRes')
-  }
-
+  /*/ Meet sheduling/*/
 
   useEffect(()=>{
-     setTimeout(() => {
 
-      if(Talk === 'My name is Gokul') {
-        console.log("Responce sussesed");
-      }else {
-        console.log("Responce sussesed");
-        navigate('/NotRes')
-  
-      }
-      
-     }, 12000);
+    if(Talk === "please shedule meet" ) {
+      console.log("Give answer to meet");
+      AlertBox()
+    }
 
   },[])
 
 
+  const Navigation = () => {
+    // navigate('/NotRes')
+    AlertBox()
+  }
 
+
+
+
+  // useEffect(() => {
+  //   console.log("Position number", selection);
+
+  //   Assist()
+  //   console.log("Speak data", Voicedata);
+  //   console.log("Qa", Qa);
+
+  // console.log("This is input data",Typed);
+  // setTalk(Typed);
+
+
+
+  // }, [Assist])
+
+  // const TypedData = () => {
+  //   console.log('Typed data',Typed);
+  //   navigate('/NotRes')
+  // }
+
+
+  // useEffect(()=>{
+  //    setTimeout(() => {
+
+  //     if(Talk === 'My name is Gokul') {
+  //       console.log("Responce sussesed");
+  //     }else {
+  //       console.log("Responce sussesed");
+  //       navigate('/NotRes')
+  
+  //     }
+      
+  //    }, 12000);
+
+  // },[])
 
 
   const Logo1 = "https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.1&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1y80"
   const User = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.3&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1yt3';
 
+
+  
 
   return (
     <div>
@@ -230,7 +282,6 @@ function Responce() {
 
         <div className='mt-[17px] ml-[0px] md:ml-[30px] md:mt-[21px] lg:mt-[29px] lg:ml-[60px] sm:ml-[10px]  '>
 
-       
 
           <MovingText className='font-light text-[18px] md:text-[29px]'
       type="slideInFromBottom"
@@ -352,7 +403,7 @@ function Responce() {
 
       <div className='bg-white-400 w-full h-[60px] mt-[1px] md:m-[12px]  '>
 
-        <Button onClick={()=> AlertBox()} className=' bg-orange-600 h-[40px] w-[100px] ml-[15px] md:ml-[50px] md:h-[60px] md:w-[140px]   '>
+        <Button onClick={()=> Navigation()} className=' bg-orange-600 h-[40px] w-[100px] ml-[15px] md:ml-[50px] md:h-[60px] md:w-[140px]   '>
 
           <h1 className='text-[14px] mt-[-3px] md:text-[17px] md:mt-[3px]'>Send</h1>
 
