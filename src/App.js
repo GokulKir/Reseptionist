@@ -13,11 +13,15 @@ import {
   useRecoilState,
   useRecoilValue,
 } from 'recoil';
+// import { Connector } from 'mqtt-react-hooks';
+
+
 
 
 export default function App() {
   return (
     <BrowserRouter>
+    {/* <Connector brokerUrl="wss://test.mosquitto.org:1884"></Connector> */}
       <RecoilRoot>
         <Routes>
           <Route path="/" element={<Talk />}>
