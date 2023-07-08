@@ -10,7 +10,8 @@ import Speech from 'speak-tts';
 import { TextTransition, presets } from 'react-text-transition';
 import { useRecoilState } from 'recoil';
 import { VoiceAssist } from '../../Recoil/recoil';
-
+import mqtt, { log } from 'mqtt/dist/mqtt'
+import { useSocket } from '../../Context/SocketContext';
 
 function Talk() {
 
@@ -22,13 +23,17 @@ function Talk() {
     const navigate = useNavigate();
     const { speak } = useSpeechSynthesis();
     const speech = new Speech()
+    const socket = useSocket();
+    
 
-
-
-
-
-
-
+    useEffect(() => {
+        socket.on('message',(data)=>{
+            
+            console.log(data,"socket data");
+        });
+    }, [])
+    
+    
 
     const Logo = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.4&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1ym1';
     const User = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.3&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1yt3';

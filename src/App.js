@@ -13,12 +13,21 @@ import {
   useRecoilState,
   useRecoilValue,
 } from 'recoil';
+import {SocketProvider} from './Context/SocketContext'
+
+// const URL = process.env.PORT === 'production' ? undefined : 'http://localhost:5000';
+
+const SocketURL = 'http://localhost:5000';
+
+
+
 
 
 export default function App() {
   return (
     <BrowserRouter>
       <RecoilRoot>
+      <SocketProvider url = {SocketURL}>
         <Routes>
           <Route path="/" element={<Talk />}>
           </Route>
@@ -29,6 +38,7 @@ export default function App() {
           <Route path='Conditions' element={<Conditions />}>
           </Route>
         </Routes>
+        </SocketProvider>
       </RecoilRoot>
     </BrowserRouter>
   );
