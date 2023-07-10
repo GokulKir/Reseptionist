@@ -30,7 +30,15 @@ function Talk() {
         socket.on('message',(data)=>{
             
             console.log(data,"socket data");
+            const jsonData = JSON.parse(data);
+      console.log("JSON data", jsonData);
+      const { user, allUser } = jsonData;
+
+      const message = new SpeechSynthesisUtterance(user.display_name);
+      window.speechSynthesis.speak(message);
         });
+
+        
     }, [])
     
     

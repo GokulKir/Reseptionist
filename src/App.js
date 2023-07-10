@@ -17,8 +17,7 @@ import {SocketProvider} from './Context/SocketContext'
 
 // const URL = process.env.PORT === 'production' ? undefined : 'http://localhost:5000';
 
-const SocketURL = 'http://localhost:5000';
-
+const SocketURL = 'https://hubo3.domainenroll.com'
 
 
 

@@ -18,6 +18,8 @@ import { Icon } from '@iconify/react';
 import MovingText from 'react-moving-text'
 import { useFaceDetection } from 'react-use-face-detection';
 import Swal from 'sweetalert2'
+import { useSocket } from '../../Context/SocketContext';
+import moment from 'moment';
 
 
 
@@ -34,17 +36,111 @@ function Responce() {
   const [Typed , setTyped] = useState()
   const [Qa, setQa] = useRecoilState(Question)
   const [condition , setcondition] = useState('Check the condition')
+  const [selection , setSelection] = useState(0)
+  const [givenName , setgivenName] = useState()
+  const [giventime , setgivenTime] = useState()
+  const [ta , setTa] = useState('meet a')
   const navigate = useNavigate()
+  const [DisplayName, setDisplayName] = useState(null)
   const speech = new Speech()
   const id  = useId()
+ const [data , setData] = useState()
+  const socket = useSocket()
+
+
+  const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
   
+
+ 
+
+  useEffect(()=>{
+
+    socket.on("message", (data) => {
+      console.log(data, "Socket data");
+      const jsonData = JSON.parse(data);
+      console.log("JSON data", jsonData);
+      const { user, allUser } = jsonData;
+      console.log("User******", user);
+      console.log("All Users*******", allUser);
+      setDisplayName(user)
+      setData(allUser);
+      
+      
+      if (allUser && allUser.length > 0 ) {
+        const foundUser = allUser.find((user) => user.display_name === Talk);
+        if (foundUser  || `meet a ${foundUser}` || `meet sheduled a ${foundUser}`) {
+          AlertBox()
+          setgivenName(foundUser.display_name);
+          // console.log("Matched userData", display_name);
+
+        }
+      }
+
+
+
+    });
+
+   
+
+
+  
+    
+  },[])
+
+
+  useEffect(() => {
+    if(DisplayName?.display_name){
+      console.log(DisplayName,'DisplayName');
+    const confirmed = new SpeechSynthesisUtterance(condition);
+    // window.speechSynthesis.speak(DisplayName?.display_name);
+    }
+  }, [DisplayName])
+  
+  
+
+
+   
+
+
+
+  const MeetaPerson = () => {
+
+    AlertBox()
+    setSelection(0)
+
+  }
+
+
+  const  MeetAlert = () => {
+   
+    console.log('Which person to meet?');
+
+
+
+    Swal.fire({
+      title: 'which person to meet?',
+      text: "Please name the person?",
+      icon: 'question',
+      confirmButtonText: 'Cancel',
+   
+    }).then((res)=>{
+      console.log("responce" , res);
+    })
+
+    if(givenName) {
+      AlertBox()
+    }
+  }
+
+
+
   const name = "Jestin"
 
 
   const AlertBox = () => {
     Swal.fire({
       title: 'Confirm',
-      text: `Let me confirm, so you are here to meet ${name}`,
+      text: `Let me confirm, so you are here to meet ${givenName}`,
       icon: 'info',
       confirmButtonText: 'Yes',
       confirmButtonColor: '#FB8C00',
@@ -146,8 +242,9 @@ function Responce() {
       window.speechSynthesis.speak(confirmed);
 
       setcondition('')
+      MeetAlert()
 
-      AlertBox()
+      // AlertBox()
 
     
       
@@ -160,6 +257,10 @@ function Responce() {
   useEffect(()=>{
 
     startListening()
+  
+   
+
+ 
 
   },[startListening])
 
@@ -197,8 +298,11 @@ function Responce() {
 
     if(Talk === "please shedule meet" ) {
       console.log("Give answer to meet");
-      AlertBox()
+      MeetAlert()
+     
     }
+
+  
 
   },[])
 
@@ -320,60 +424,69 @@ function Responce() {
           </div>
 
 
-          <div className='flex justify-center'>
-            <div className='w-[520px] h-[90px] md:w-[700px] lg:w-[1100px] pl-[5px] pt-[10px]  '>
-
-
          
-          
-              <div className=' flex flex-row '>
-
-              
-
-                {/* <Icon className='w-[20px] h-[20px] md:w-[30px] md:h-[30px] lg-[40px] lg-[40px]' icon="ph:question-fill" /> */}
-                <Icon className='w-[25px] h-[25px] ml-[30px] md:ml-[20px] md:w-[30px] md:h-[30px] lg-[40px] lg-[40px]' icon="solar:user-bold" />
-
-
-            <MovingText className='ml-[18px] text-[15px] md:text-[20px]'
-      type="slideInFromBottom"
-      duration="1000ms"
-      delay="0s"
-      direction="normal"
-      timing="ease"
-      iteration="1"
-      fillMode="none">
-       {Talk}
-    </MovingText>
-
-              </div>
-
-
-           
-
-
-            </div>
-          </div>
 
 
 
 
 
-          {/* <Button onClick={() => setSelection(0)} className='w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] bg-orange-600  content-center '>
-            <h1 className='text-[8px]  md:text-[17px] '>To meet a persone</h1>
-          </Button>
+          {selection === 0 ? 
 
-          <Button onClick={()=> setSelection(1)} className='w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] border-1 border-orange-600  content-center '>
-            <h1 className='text-[8px] md:text-[17px] text-orange-600'>Book An Appointment </h1>
-          </Button>
+<Button onClick={() => MeetAlert()} className='w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] bg-orange-600  content-center '>
+  <h1 className='text-[8px]  md:text-[17px] '>To meet a person</h1>
+</Button>
 
-          <Button onClick={()=> setSelection(2)} className='w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] border-1 border-orange-600  content-center '>
-            <h1 className='text-[8px]  md:text-[17px]   text-orange-600'>Business Enquiry</h1>
-          </Button>
+:
 
-          <Button onClick={()=> setSelection(3)} className='w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] border-1 border-orange-600  content-center '>
-            <h1 className='text-[8px]  md:text-[17px]   text-orange-600'>Service Query</h1>
-          </Button> */}
 
+<Button onClick={()=> setSelection(0)} className='w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] border-1 border-orange-600  content-center '>
+<h1 className='text-[8px] md:text-[17px] text-orange-600'>To meet a person </h1>
+</Button>
+
+}
+
+{selection === 1  ?
+
+<Button onClick={()=> setSelection(1)} className='w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] bg-orange-600  content-center '>
+<h1 className='text-[8px] md:text-[17px] text-white-600'> Book An Appointment </h1>
+</Button>
+
+
+:
+// Book An Appointment
+
+<Button onClick={()=> setSelection(1)} className='w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] border-1 border-orange-600  content-center '>
+<h1 className='text-[8px] md:text-[17px] text-orange-600'> Book An Appointment </h1>
+</Button>
+
+}
+
+{selection === 2 ?
+
+<Button onClick={()=> setSelection(2)} className='w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] border-1 bg-orange-600  content-center '>
+  <h1 className='text-[8px]  md:text-[17px]   text-white-600'>Business Enquiry</h1>
+</Button>
+:
+
+<Button onClick={()=> setSelection(2)} className='w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] border-1 border-orange-600  content-center '>
+<h1 className='text-[8px]  md:text-[17px]   text-orange-600'>Business Enquiry</h1>
+</Button>
+
+}
+
+{selection === 3 ?
+
+<Button onClick={()=> setSelection(3)} className='w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] border-1 bg-orange-600  content-center '>
+  <h1 className='text-[8px]  md:text-[17px]   text-white-600'>Service Query</h1>
+</Button>
+
+:
+
+<Button onClick={()=> setSelection(3)} className='w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] border-1 border-orange-600  content-center '>
+<h1 className='text-[8px]  md:text-[17px]   text-orange-600'>Service Query</h1>
+</Button>
+
+}
 
           <div className='w-[1px]'>
 
