@@ -13,6 +13,8 @@ import { ListUsers, VoiceAssist } from '../../Recoil/recoil';
 import mqtt, { log } from 'mqtt/dist/mqtt'
 import { useSocket } from '../../Context/SocketContext';
 
+const Logo = require('../../assets/Robo.png');
+const Robo = require('../../assets/Logo.png');
 
 function Talk() {
 
@@ -106,8 +108,8 @@ function Talk() {
     
 
 
-    const Logo = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.4&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1ym1';
-    const User = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.3&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1yt3';
+    // const Logo = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.4&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1ym1';
+    // const User = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.3&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1yt3';
 
     const ResponceP = () => {
         const ResponceP = () => {
@@ -181,12 +183,20 @@ function Talk() {
         if (transcript === text ||
              text.includes("hi Nora") ||
               text.includes("i Nora") || 
-              text.includes("hey Nora") ) {
+              text.includes("hey Nora") || 
+              text.includes("hey Nara") ||
+              text.includes("hi Nara") ) {
 
+    
+                const Talking = new SpeechSynthesisUtterance(sp);
 
+                if(Talking) {
 
+                window.speechSynthesis.speak(Talking);
 
-            // speak({ text: sp })
+                }
+
+               
 
             setSp('')
 
@@ -231,7 +241,7 @@ function Talk() {
 
                 <div className=''>
 
-                    <img className=' w-[80px] md:w-[120px] lg:w-[140px] sm:w-[90px] md:max-lg:flex' src={User} />
+                    <img className=' w-[80px] md:w-[120px] lg:w-[140px] sm:w-[90px] md:max-lg:flex' src={Robo} />
 
                 </div>
 
