@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Col, Container, Row, Image, Stack } from 'react-bootstrap';
 import '../../index.css';
-import { Button } from "@material-tailwind/react";
+import { Button, dialog } from "@material-tailwind/react";
 import { ThemeProvider } from 'styled-system';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSpeechSynthesis } from 'react-speech-kit';
@@ -12,14 +12,16 @@ import { useRecoilState } from 'recoil';
 import { VoiceAssist } from '../../Recoil/recoil';
 import mqtt, { log } from 'mqtt/dist/mqtt'
 import { useSocket } from '../../Context/SocketContext';
+import moment from 'moment' 
 
 function Talk() {
 
-
+    
 
     const [sp, setSp] = useState('Hello there , How can i help you today?')
     const [talk, setTalk] = useState()
     const [VoiceAssistant, setVoiceAssistant] = useRecoilState(VoiceAssist)
+    const [Diaplpog, setDiaplpog] = useState(null)
     const navigate = useNavigate();
     const { speak } = useSpeechSynthesis();
     const speech = new Speech()
@@ -30,8 +32,56 @@ function Talk() {
         socket.on('message',(data)=>{
             
             console.log(data,"socket data");
+            const jsonData = JSON.parse(data);
+      console.log("JSON data", jsonData);
+      const { user, allUser } = jsonData;
+      console.log(user.display_name,"user.display_name***");
+      setDiaplpog(user.display_name,()=>console.log("the value is updated"))
+
+        });
+
+        socket.on('allusers',(data)=>{
+            
+            console.log(data,"socket data");
+        });
+
+        const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
+
+// console.log(currentTime); // Example output: 2023-07-10 15:30:45
+
+      const mockData = {
+        user_id:'9f94e975-5727-45ab-b155-b2672d1605df',
+        date_time:currentTime
+      }
+
+        socket.emit("payload",mockData);
+
+        socket.on("apiResponse", (data) => {
+            console.log("API Response:", data);
+            // Handle the API response here
         });
     }, [])
+
+
+    // useEffect(() => {
+    //     const callMessage =(data)=>{
+    //     window.speechSynthesis.speak(data);
+
+    //     }
+    //     console.log('====================================');
+    //     console.log(Diaplpog);
+    //     console.log('====================================');
+    //     if(Diaplpog){
+    //         console.log("2222**");
+    //     const message = new SpeechSynthesisUtterance(Diaplpog);
+    //     callMessage(message)
+
+
+    
+    //         navigate('/Responce');
+    //     }
+    // }, [Diaplpog])
+    
     
     
 
@@ -100,7 +150,7 @@ function Talk() {
         const text = "Nora" || "hi Nora" || "hey Nora" || 'i Nora'
 
         if (transcript === text) {
-
+        console.log(text,"**********");
 
 
 
