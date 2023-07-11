@@ -4,14 +4,15 @@ import '../../index.css';
 import { Button } from "@material-tailwind/react";
 import { ThemeProvider } from 'styled-system';
 import { Link, useNavigate } from 'react-router-dom';
-import { useSpeechSynthesis } from 'react-speech-kit';
+// import { useSpeechSynthesis } from 'react-speech-kit';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import Speech from 'speak-tts';
 import { TextTransition, presets } from 'react-text-transition';
 import { useRecoilState } from 'recoil';
-import { VoiceAssist } from '../../Recoil/recoil';
+import { ListUsers, VoiceAssist } from '../../Recoil/recoil';
 import mqtt, { log } from 'mqtt/dist/mqtt'
 import { useSocket } from '../../Context/SocketContext';
+
 
 function Talk() {
 
@@ -21,27 +22,89 @@ function Talk() {
     const [talk, setTalk] = useState()
     const [VoiceAssistant, setVoiceAssistant] = useRecoilState(VoiceAssist)
     const navigate = useNavigate();
-    const { speak } = useSpeechSynthesis();
+    // const { speak } = useSpeechSynthesis();
     const speech = new Speech()
     const socket = useSocket();
+    const [DisplatName, setDisplatName] = useState(null)
+    const [listUsers, setListUsers] = useRecoilState(ListUsers)
+   
     
 
-    useEffect(() => {
-        socket.on('message',(data)=>{
-            
-            console.log(data,"socket data");
-            const jsonData = JSON.parse(data);
-      console.log("JSON data", jsonData);
-      const { user, allUser } = jsonData;
+    // useEffect(() => {
+    // socket.on('message',(data)=>{    
+    //  console.log(data,"socket data");
+    //   const jsonData = JSON.parse(data);
+    //   console.log("JSON data", jsonData);
+    //   const { user, allUser } = jsonData;
 
-      const message = new SpeechSynthesisUtterance(user.display_name);
-      window.speechSynthesis.speak(message);
-        });
+    //   const message = new SpeechSynthesisUtterance(user.display_name);
+    //   window.speechSynthesis.speak();
+    //     });
 
         
-    }, [])
+    // }, [])
+
+
+
+    useEffect(()=>{
+
+        socket.on("message", (data) => {
+            console.log(data, "Socket data");
+            const jsonData = JSON.parse(data);
+            console.log("JSON data", jsonData);
+            const { user, allUser    } = jsonData;
+            console.log("User******", user);
+            console.log("All Users*******", allUser);
+         
+
+                setDisplatName(user.display_name)
+                setListUsers(allUser)
+
+            
+      
+        
+        })
+    },[])
+
     
+
+
+
+
+
+
+
+    useEffect(() => {
+  console.log(DisplatName,"Display  Name ********************************    ");
+ 
+
+  try {
+    const responce = new SpeechSynthesisUtterance("Hello"+DisplatName);
+    if(DisplatName) {
+
+        window.speechSynthesis.speak(responce);
+
+    }
+
+  if(DisplatName === undefined) { 
+      navigate('/Responce')
+  }
+
+
+    setDisplatName(null)
+  
+  } catch (error) {
+    console.log(error.message);
+  }
+          
+           
+        
+    }, [DisplatName])
     
+
+
+    
+
 
     const Logo = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.4&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1ym1';
     const User = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.3&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1yt3';
@@ -72,7 +135,7 @@ function Talk() {
         listening,
     } = useSpeechRecognition({
         language: 'en-US',
-        continuous: true,
+        continuous: true,navigate
     });
 
     const ResponcePage = () => {
@@ -92,6 +155,14 @@ function Talk() {
 
     }
 
+     const Message = async () => {
+
+     
+
+     }
+
+
+
 
 
     const startRecord = async () => {
@@ -105,14 +176,17 @@ function Talk() {
 
 
 
-        const text = "Nora" || "hi Nora" || "hey Nora" || 'i Nora'
+        const text = "Nora" 
 
-        if (transcript === text) {
+        if (transcript === text ||
+             text.includes("hi Nora") ||
+              text.includes("i Nora") || 
+              text.includes("hey Nora") ) {
 
 
 
 
-            speak({ text: sp })
+            // speak({ text: sp })
 
             setSp('')
 

@@ -28,3 +28,8 @@ export const Question = atom({
   key : 'questionState',
   default : '' ,
 })
+
+export const ListUsers = atom({
+  key : "listUsers",
+  default : []
+})

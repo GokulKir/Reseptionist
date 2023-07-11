@@ -14,6 +14,7 @@ import {
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+// root.setAttribute('notranslate', true)
 root.render(
   <React.StrictMode>
     <App />
