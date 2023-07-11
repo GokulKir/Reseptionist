@@ -13,13 +13,14 @@ import {
   useRecoilState,
   useRecoilValue,
 } from 'recoil';
-import { VoiceAssist, VoiceData,  Question } from '../../Recoil/recoil';
+import { VoiceAssist, VoiceData,  Question, ListUsers } from '../../Recoil/recoil';
 import { Icon } from '@iconify/react';
 import MovingText from 'react-moving-text'
 import { useFaceDetection } from 'react-use-face-detection';
 import Swal from 'sweetalert2'
 import { useSocket } from '../../Context/SocketContext';
 import moment from 'moment';
+
 
 
 
@@ -35,50 +36,69 @@ function Responce() {
   const [Talk , setTalk] = useState('')
   const [Typed , setTyped] = useState()
   const [Qa, setQa] = useRecoilState(Question)
-  const [condition , setcondition] = useState('Check the condition')
+  const [condition , setcondition] = useState('Which employee would you prefered to?');
+
   const [selection , setSelection] = useState(0)
   const [givenName , setgivenName] = useState()
   const [giventime , setgivenTime] = useState()
+  const [listUsers, setListUsers] = useRecoilState(ListUsers)
   const [ta , setTa] = useState('meet a')
   const navigate = useNavigate()
   const [DisplayName, setDisplayName] = useState(null)
   const speech = new Speech()
   const id  = useId()
- const [data , setData] = useState()
-  const socket = useSocket()
-
-
-  const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
-  
+const [data , setData] = useState()
+ const socket = useSocket()
 
  
 
   useEffect(()=>{
+    const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
 
     socket.on("message", (data) => {
       console.log(data, "Socket data");
       const jsonData = JSON.parse(data);
       console.log("JSON data", jsonData);
-      const { user, allUser } = jsonData;
+      const { user, allUser    } = jsonData;
       console.log("User******", user);
       console.log("All Users*******", allUser);
+
       setDisplayName(user)
       setData(allUser);
+      console.log("Current data"+ currentTime);
+
+      socket.emit("payload", {    });
+
+        socket.on("apiResponse", (data) => {
+            console.log("API Response:", data);
+            // Handle the API response here
+        });
       
       
       if (allUser && allUser.length > 0 ) {
-        const foundUser = allUser.find((user) => user.display_name === Talk);
+        const foundUser = allUser.find((user) => user?.display_name === Talk);
+        console.log("User ID+++++",user.user_id);
         if (foundUser  || `meet a ${foundUser}` || `meet sheduled a ${foundUser}`) {
           AlertBox()
-          setgivenName(foundUser.display_name);
+          setgivenName(foundUser?.display_name);
           // console.log("Matched userData", display_name);
-
         }
       }
 
 
 
+  // socket.emit("payload", { message: currentTime });
+
+  // socket.on("apiResponse", (data) => {
+  //     console.log("API Response:", data);
+  //     // Handle the API response here
+  // });
+
+
+
     });
+
+
 
    
 
@@ -86,6 +106,36 @@ function Responce() {
   
     
   },[])
+
+
+
+
+  useEffect(()=>{
+    socket.emit("getAllUsers", { message: "Hello from the client" });
+  
+    socket.on("userList", (data) => {
+        console.log("API Response:", data);
+        // Handle the API response here
+        const userJson = JSON.parse(data);
+        console.log("API Response:", userJson);
+    });
+   },[])
+
+
+   useEffect(()=> {
+
+
+
+   },[])
+
+
+  useEffect(() => {
+ console.log(listUsers,"listUsers");
+  }, [listUsers])
+  
+
+
+
 
 
   useEffect(() => {
@@ -114,6 +164,8 @@ function Responce() {
   const  MeetAlert = () => {
    
     console.log('Which person to meet?');
+    const confirmed = new SpeechSynthesisUtterance(condition);
+    window.speechSynthesis.speak(confirmed);
 
 
 
@@ -122,9 +174,12 @@ function Responce() {
       text: "Please name the person?",
       icon: 'question',
       confirmButtonText: 'Cancel',
+      timer: 9000 
    
     }).then((res)=>{
       console.log("responce" , res);
+      navigate('/NotRes')
+
     })
 
     if(givenName) {
@@ -133,11 +188,14 @@ function Responce() {
   }
 
 
+ 
+
 
   const name = "Jestin"
 
 
   const AlertBox = () => {
+    if(givenName === Talk) {
     Swal.fire({
       title: 'Confirm',
       text: `Let me confirm, so you are here to meet ${givenName}`,
@@ -163,13 +221,13 @@ function Responce() {
       }
     });
   }
+  }
 
 
   const Assist = async () => {
     await SpeechRecognition.startListening();
     console.log("This is voice" + transcript);
     setTalk(transcript)
-
   
   }
 
@@ -231,36 +289,45 @@ function Responce() {
 
     console.log("Hello", transcript);
 
-    const text = 'meet a person' 
+    const text = 'meet' 
 
-    if (transcript === text) {
+    if (transcript === text || text.includes("please meet a person" ) 
+    || text.includes('please shedule a meeting')
+     ||  text.includes("please shedule a meet") ){
 
       console.log("Meet sheduled")
-
-
       const confirmed = new SpeechSynthesisUtterance(condition);
       window.speechSynthesis.speak(confirmed);
-
       setcondition('')
       MeetAlert()
-
       // AlertBox()
-
-    
-      
     }
-
   }
 
+
+  useEffect(()=>{
+
+    console.log("User given name"+givenName)
+
+    if(Talk === givenName){
+
+      const confirmed = new SpeechSynthesisUtterance('Hello'+givenName);
+      window.speechSynthesis.speak(confirmed);
+
+      AlertBox()
+
+    
+
+
+    }
+
+  },[])
 
 
   useEffect(()=>{
 
     startListening()
-  
-   
 
- 
 
   },[startListening])
 
@@ -273,14 +340,16 @@ function Responce() {
     const speakText = () => {
       setSp('what is the purpose of your visit?')
       console.log("This is voice " + AllVoice);
-      const message = new SpeechSynthesisUtterance('What is the purpose of your visit?');
-      window.speechSynthesis.speak(message);
+      const mettingPurposeSpeach = new SpeechSynthesisUtterance(Timesp);
+      window.speechSynthesis.speak(mettingPurposeSpeach);
     };
-
-    const intervalId = setInterval(speakText, 10000);
+    // const intervalId = setInterval(speakText, 10000);
+    setTimeout(() => {
+      speakText();
+    }, 1000);
 
     // Clean up the interval when the component unmounts
-    return () => clearInterval(intervalId);
+    // return () => clearInterval(intervalId);
 
     if ('what is the purpose of your visit?') {
 
@@ -299,7 +368,6 @@ function Responce() {
     if(Talk === "please shedule meet" ) {
       console.log("Give answer to meet");
       MeetAlert()
-     
     }
 
   
@@ -314,6 +382,29 @@ function Responce() {
 
 
 
+  useEffect(()=> {
+
+    const dynamicName = 'jaimy';
+
+const data = [
+  {
+    Name: 'jestin xavier',
+    id: 1
+  },
+  {
+    Name: 'jaimy kx',
+    id: 2
+  },
+  {
+    Name: 'vipin balakrishnan',
+    id: 3
+  }
+];
+
+const result = data.find(obj => obj.Name.includes(dynamicName));
+console.log(result);
+
+  },[])
 
   // useEffect(() => {
   //   console.log("Position number", selection);

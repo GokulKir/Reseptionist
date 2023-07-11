@@ -1,17 +1,41 @@
 import React, { useEffect } from 'react';
 import ReactLoading from 'react-loading';
+import Swal from 'sweetalert2';
+
 
 function Conditions() {
 
-    const Checked = ()=>{
-    
-        
-
-  
-    }
 
     useEffect(()=>{
 
+ setTimeout(() => {
+
+  Swal.fire({
+    title: 'Confirm',
+    text: 'meet confirmed' ,
+    icon: 'success',
+    confirmButtonText: 'Yes',
+    confirmButtonColor: '#FB8C00',
+    iconColor: '#22c2e6',
+    showCancelButton: true,
+    cancelButtonText: 'No',
+    cancelButtonColor: '#757575',
+    buttonsStyling: false,
+    customClass: {
+      confirmButton: 'swal-confirm-button',
+      cancelButton: 'swal-cancel-button'
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
+       console.log("Is conformed");
+     
+    } else if (result.dismiss === Swal.DismissReason.cancel) {
+         console.log("Is Rejected");
+       
+    }
+  });
+  
+ }, 2500);
 
 
     },[])

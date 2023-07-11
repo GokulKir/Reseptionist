@@ -24,9 +24,9 @@ const SocketURL = 'https://hubo3.domainenroll.com'
 
 export default function App() {
   return (
-    <BrowserRouter>
       <RecoilRoot>
       <SocketProvider url = {SocketURL}>
+      <BrowserRouter>
         <Routes>
           <Route path="/" element={<Talk />}>
           </Route>
@@ -37,9 +37,11 @@ export default function App() {
           <Route path='Conditions' element={<Conditions />}>
           </Route>
         </Routes>
+        </BrowserRouter>
         </SocketProvider>
       </RecoilRoot>
-    </BrowserRouter>
+    
+   
   );
 }
 
