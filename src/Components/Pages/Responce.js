@@ -180,6 +180,8 @@ const [data , setData] = useState()
    
     }).then((res)=>{
       console.log("responce" , res);
+   navigate('/NotRes')
+
  
 
     })

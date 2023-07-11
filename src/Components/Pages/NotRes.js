@@ -8,6 +8,8 @@ import "react-dropdown-now/style.css";
 import "./NotRes";
 import { useSocket } from "../../Context/SocketContext";
 import moment from "moment";
+import Speech from 'speak-tts';
+
 const FullData = [
 		{
 			id: 1,
@@ -227,6 +229,8 @@ const FullData = [
 		},
 	];
 
+	
+
 function NotRes() {
 	const navigate = useNavigate();
 	const [Option, setOpation] = useState(false);
@@ -235,7 +239,7 @@ function NotRes() {
 
 	const [data, setData] = useState("Department");
 	const [userData, setUserData] = useState("");
-
+	const [Spe, setSpe] = useState("I am sorry , but couldn't catch you . Could you please select the concerned from the drop down list on the Tab next to me")
 	const [userLIST, setUserList] = useState(FullData);
 
 	const socket = useSocket();
@@ -341,8 +345,23 @@ function NotRes() {
   
     socket.on("apiResponse", handleApiResponse);
     
-    // navigate("/Conditions");
+    navigate("/Conditions");
   };
+
+  
+  useEffect(()=>{
+   
+	if(Spe === "I am sorry , but couldn't catch you . Could you please select the concerned from the drop down list on the Tab next to me") {
+
+	const confirmed = new SpeechSynthesisUtterance(Spe);
+	window.speechSynthesis.speak(confirmed);
+
+	setSpe('')
+
+	}
+
+
+  },[])
   
 
 	return (
@@ -357,8 +376,8 @@ function NotRes() {
 			</div>
 
 			<div className='flex justify-center'>
-				<div className='w-11/12 h-[80px] md:h-[90px] lg:h-[100px] bg-white-400 mt-9  border-1 border-grey-50 rounded'>
-					<div className='flex flex-row  justify-between'>
+				{/* <div className='w-11/12 h-[80px] md:h-[90px] lg:h-[100px] bg-white-400 mt-9  border-1 border-grey-50 rounded'> */}
+					{/* <div className='flex flex-row  justify-between'>
 						<div className='w-[2000px] h-[40px] md:mt-[30px] ml-[20px] mt-[25px] lg:mt-[35px]'>
 							<p className=''>{data}</p>
 						</div>
@@ -371,11 +390,38 @@ function NotRes() {
 								<Icon icon='bxs:up-arrow' rotate={2} />
 							</button>
 						</div>
-					</div>
-				</div>
+					</div> */}
+
+							<select id="countries" className=" w-11/12 h-[80px] md:h-[90px] lg:h-[100px] bg-white-400 mt-9 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-600 focus:border-orange-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-600 dark:focus:border-orange-600">
+
+					{FullData.map((obj , i)=>
+					
+						
+				
+					
+						
+							<option value="">{obj.job_title }</option> 
+
+
+                 
+
+					
+
+							
+							
+							
+						)}
+						  </select>
+							
+				
+
+				{/* </div> */}
 			</div>
 
-			<div className='flex justify-center'>
+
+
+
+			{/* <div className='flex justify-center'>
 				{open ? (
 					<ul className='w-11/12 mr-[40px] absolute'>
 						<div>
@@ -395,28 +441,18 @@ function NotRes() {
 						</div>
 					</ul>
 				) : null}
-			</div>
+			</div> */}
 
 			<div className='flex justify-center'>
 				<div className='w-11/12 h-[80px] md:h-[90px] lg:h-[100px] bg-white-400 mt-9   border-1 border-grey-50 rounded'>
-					<div className='flex flex-row  justify-between'>
-						<div className='w-[120px] h-[40px] md:mt-[30px] ml-[20px] mt-[25px] lg:mt-[35px]'>
-							<p className=''>Persone</p>
-						</div>
+				<select id="countries" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-600 focus:border-orange-600 block w-full h-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-600 dark:focus:border-orange-600">
+ {FullData.map((obj , i)=> 
+  <option value="US">{obj.display_name}</option>
 
-						<div
-							className='mr-[25px] mt-[20px] w-[40px] h-[40px] '
-							style={{ display: "grid", placeItems: "center" }}
-						>
-							<button
-								id='dropdownDefaultButton'
-								data-dropdown-toggle='dropdown'
-								onClick={() => handleUserOpen()}
-							>
-								<Icon icon='bxs:up-arrow' rotate={2} />
-							</button>
-						</div>
-					</div>
+ )}
+ 
+
+</select>
 				</div>
 
 			</div>
@@ -451,21 +487,21 @@ function NotRes() {
 
 
 
-<label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select an option</label>
-<select id="countries" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-  <option selected>Choose a country</option>
-  <option value="US">United States</option>
-  <option value="CA">Canada</option>
-  <option value="FR">France</option>
-  <option value="DE">Germany</option>
-</select>
+
+
 
 
 			<div className='flex justify-center'>
 				<div className='w-11/12 h-[80px] md:h-[90px] lg:h-[100px] bg-white-400 mt-9   border-1 border-grey-50 rounded'>
-					<div className='flex flex-row  justify-between'>
-						<div className='w-[200px] h-[40px] md:mt-[30px] ml-[20px] mt-[25px] lg:mt-[35px]'>
-							<p className=''>Purpose of visit (text area)</p>
+					<div className='flex   justify-between'>
+						<input placeholder="Purpose of visit (text area)" className='w-full h-full md:mt-[30px] ml-[20px] mt-[25px] lg:mt-[35px]'>
+							{/* <p className=''>Purpose of visit (text area)</p> */}
+						</input>
+						<div
+							className='mr-[38px] mt-[20px] w-[40px] h-[40px] '
+							style={{ display: "grid", placeItems: "center" }}
+						>
+						
 						</div>
 					</div>
 				</div>
