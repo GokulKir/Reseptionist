@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Collapse } from "react-collapse";
 import { Dropdown, Selection } from "react-dropdown-now";
 import "react-dropdown-now/style.css";
-import "./NotRes";
+import "./ContactForm";
 import { useSocket } from "../../Context/SocketContext";
 import moment from "moment";
 import Speech from "speak-tts";
@@ -229,7 +229,7 @@ const FullData = [
   },
 ];
 
-function NotRes() {
+function ContactForm() {
   const navigate = useNavigate();
   const [Option, setOpation] = useState(false);
   const [open, setOpen] = React.useState(false);
@@ -275,17 +275,6 @@ function NotRes() {
     },
   ];
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
-
-  useEffect(() => {
-    console.log(userData, "userData");
-  }, [userData]);
-
-  useEffect(() => {
-    console.log("User List", userLIST);
-  }, [userLIST]);
 
   const handleOpen = () => {
     setOpen(!open);
@@ -369,77 +358,16 @@ function NotRes() {
         </div>
       </div>
 
-      <div className="flex justify-center">
-        {/* <div className='w-11/12 h-[80px] md:h-[90px] lg:h-[100px] bg-white-400 mt-9  border-1 border-grey-50 rounded'> */}
-        {/* <div className='flex flex-row  justify-between'>
-						<div className='w-[2000px] h-[40px] md:mt-[30px] ml-[20px] mt-[25px] lg:mt-[35px]'>
-							<p className=''>{data}</p>
-						</div>
-
-						<div
-							className='mr-[38px] mt-[20px] w-[40px] h-[40px] '
-							style={{ display: "grid", placeItems: "center" }}
-						>
-							<button onClick={() => handleOpen()}>
-								<Icon icon='bxs:up-arrow' rotate={2} />
-							</button>
-						</div>
-					</div> */}
-
-        <select
-          id="countries"
-          className=" w-11/12 h-[80px] md:h-[90px] lg:h-[100px] bg-white-400 mt-9 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-600 focus:border-orange-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-600 dark:focus:border-orange-600"
-        >
-          {FullData.map((obj, i) => (
-            obj.job_title&&<option value="" key={i}>{obj.job_title}</option>
-          ))}
-        </select>
-
-        {/* </div> */}
-      </div>
-      <div className="flex justify-center">
-        <div className="w-11/12 h-[80px] md:h-[90px] lg:h-[100px] bg-white-400 mt-9   border-1 border-grey-50 rounded">
-          <select
-            id="countries"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-600 focus:border-orange-600 block w-full h-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-600 dark:focus:border-orange-600"
-          >
-            {FullData.map((obj, i) => (
-              <option value="" key={i}>
-                {obj.display_name}
-              </option>
-            ))}
-          </select>
+      
+      <div class="flex justify-center">
+            {/* <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">First name</label> */}
+            <input  type="text" id="first_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block three p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 w-11/12" placeholder="John" required />
         </div>
-      </div>
+      
 
-      {userLIST ? (
-        <div className="flex justify-center">
-          {useropen ? (
-            <ul className="w-11/12 mr-[40px] absolute">
-              {console.log(useropen, "user opened", userLIST)}
-              <div className="">
-                {userLIST?.map((obj, i) => (
-                  <li
-                    key={i}
-                    className="w-full h-[40px] bg-slate-400 rounded mt-0.6 shadow-md border-1 content-center justify-center"
-                  >
-                    <Button
-                      onClick={() => setUserData(obj.member_id)}
-                      className="w-full h-full text-white"
-                    >
-                      {obj.display_name}
-                    </Button>
-                  </li>
-                ))}
-              </div>
-            </ul>
-          ) : null}
-        </div>
-      ) : null}
 
       <div className="flex justify-center">
         <div className="w-11/12 h-[80px] md:h-[90px] lg:h-[100px] bg-white-400 mt-9   border-1 border-grey-50 rounded">
-          {/* <label for="message" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your message</label> */}
           <textarea
             id="message"
             rows="4"
@@ -463,4 +391,4 @@ function NotRes() {
   );
 }
 
-export default NotRes;
+export default ContactForm;
