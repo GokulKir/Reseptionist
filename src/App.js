@@ -29,7 +29,7 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Talk />}></Route>
-            <Route path="Responce" element={<Responce />}></Route>
+            <Route path="responce" element={<Responce />}></Route>
             <Route path="NotRes" element={<NotRes />}></Route>
             <Route path="contactform" element={<ContactForm />}></Route>
             <Route path="Conditions" element={<Conditions />}></Route>

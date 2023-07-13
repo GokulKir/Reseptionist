@@ -133,8 +133,6 @@ setTimeout(() => {
 
 
 
-  useEffect(() => {}, []);
-
   useEffect(() => {
     console.log(listUsers, "listUsers");
   }, [listUsers]);
@@ -304,10 +302,12 @@ setTimeout(() => {
 
     const speakText = () => {
       setSp("What is the purpose of your visit?");
-      console.log("This is voice " + AllVoice);
+      // console.log("This is voice " + AllVoice);
       const mettingPurposeSpeach = new SpeechSynthesisUtterance(Timesp);
       window.speechSynthesis.speak(mettingPurposeSpeach);
     };
+
+
     // const intervalId = setInterval(speakText, 10000);
     setTimeout(() => {
       speakText();
@@ -320,6 +320,7 @@ setTimeout(() => {
       startListening();
     }
   }, []);
+
 
   /*/ Meet sheduling/*/
 
