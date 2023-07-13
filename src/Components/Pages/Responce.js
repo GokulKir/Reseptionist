@@ -125,13 +125,18 @@ setTimeout(() => {
         console.log('====================================');
         AlertBox();
         setgivenName(foundUser?.display_name);
+
+      const confirmed = new SpeechSynthesisUtterance("Condacting" + foundUser.display_name);
+      window.speechSynthesis.speak(confirmed);
         // console.log("Matched userData", display_name);
       }
     }
-  }, [data,Talk])
+  }, [data])
   
 
-
+useEffect(()=> {
+  
+},[])
 
   useEffect(() => {}, []);
 
@@ -148,7 +153,7 @@ setTimeout(() => {
   }, [DisplayName]);
 
   const MeetaPerson = () => {
-    AlertBox();
+ 
     setSelection(0);
   };
 
@@ -171,15 +176,13 @@ setTimeout(() => {
       
     }, 9000);
 
-    if (givenName) {
-      AlertBox();
-    }
+
   };
 
   const name = "Jestin";
 
   const AlertBox = () => {
-    if (givenName === Talk) {
+ 
       Swal.fire({
         title: "Confirm",
         text: `Let me confirm, so you are here to meet ${givenName}`,
@@ -204,7 +207,7 @@ setTimeout(() => {
           navigate("/NotRes");
         }
       });
-    }
+    
   };
 
   const Assist = async () => {
@@ -284,16 +287,7 @@ setTimeout(() => {
     }
   }, []);
 
-  useEffect(() => {
-    console.log("User given name" + givenName);
 
-    if (Talk === givenName) {
-      const confirmed = new SpeechSynthesisUtterance("Hello" + givenName);
-      window.speechSynthesis.speak(confirmed);
-
-      AlertBox();
-    }
-  }, []);
 
   useEffect(() => {
     startListening();
@@ -302,16 +296,9 @@ setTimeout(() => {
   useEffect(() => {
     console.log("This id");
 
-    const speakText = () => {
-      setSp("What is the purpose of your visit?");
-      console.log("This is voice " + AllVoice);
-      const mettingPurposeSpeach = new SpeechSynthesisUtterance(Timesp);
-      window.speechSynthesis.speak(mettingPurposeSpeach);
-    };
-    // const intervalId = setInterval(speakText, 10000);
-    setTimeout(() => {
-      speakText();
-    }, 1000);
+ 
+    
+   
 
     // Clean up the interval when the component unmounts
     // return () => clearInterval(intervalId);
@@ -320,6 +307,28 @@ setTimeout(() => {
       startListening();
     }
   }, []);
+
+
+
+  const speakText = () => {
+    setSp("What is the purpose of your visit?");
+  
+    console.log("This is voice " + AllVoice);
+    const meetingPurposeSpeech = new SpeechSynthesisUtterance(Timesp);
+    window.speechSynthesis.speak(meetingPurposeSpeech);
+  };
+   
+  useEffect(()=>{
+
+    setTimeout(() => {
+      speakText()
+    }, 10000);
+
+  },[])
+
+
+
+
 
   /*/ Meet sheduling/*/
 
