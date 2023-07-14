@@ -4,12 +4,40 @@ import Swal from 'sweetalert2';
 import Popup from 'reactjs-popup';
 import { Icon } from '@iconify/react';
 import { Button } from "@material-tailwind/react";
+import { useNavigate } from 'react-router-dom';
 
 
 function Conditions() {
   const [Popup , setPopup] = useState(false)
   const [Clicked , setClicked] = useState(false)
+
+  const navigate = useNavigate()
     
+  const Allow = () => {
+
+     navigate('/contactform')
+  
+
+  }
+
+
+  const Deny =  () => {
+
+  }
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
 
 
   const CameraPermission = () => {
@@ -54,7 +82,7 @@ function Conditions() {
 
     <div className='flex justify-center'>
 
-      <Button className='w-[280px] h-[40px] border-2 border-orange-500 flex   items-center , justify-center mt-[43px] '>
+      <Button onClick={()=> Allow()} className='w-[280px] h-[40px] border-2 border-orange-500 flex   items-center , justify-center mt-[43px] '>
 
         <p className='text-black items-center justify-center m-14 font-medium'>Allow</p>
 
