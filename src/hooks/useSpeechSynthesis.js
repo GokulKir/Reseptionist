@@ -45,9 +45,6 @@ const useSpeechSynthesis = () => {
   const speech = useRef(null);
 
   useEffect(() => {
-    console.log('====================================');
-    console.log();
-    console.log('====================================');
     speech.current = new Speech();
     speech.current.init({
       volume: 0.5,
