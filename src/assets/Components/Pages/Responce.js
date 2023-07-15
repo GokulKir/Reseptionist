@@ -55,7 +55,7 @@ function Responce() {
   const id = useId();
   const [data, setData] = useState();
   const socket = useSocket();
-  const speech = new Speech();
+
 
 
   const PersonName = () => {
@@ -271,6 +271,9 @@ setTimeout(() => {
 
   
 
+useEffect(()=> {
+  
+},[])
 
   useEffect(() => {}, []);
 
@@ -400,10 +403,6 @@ setTimeout(() => {
     );
   };
 
-
-
-
-  
   const startListening = async () => {
     await SpeechRecognition.startListening();
     console.log(transcript);
@@ -412,14 +411,10 @@ setTimeout(() => {
     console.log(transcript);
   };
 
-
-
-  
-
   useEffect(() => {
     const text = "meet a person";
 
-    if ( transcript  === text || transcript ===  "please meet a person" || transcript ===  "please shedule a meeting" || transcript ===  "please shedule a meet" || transcript ===  'shedule a meet'  || transcript ===  'shedule a meet' || transcript ===  'shedule meet'
+    if ( text || "please meet a person" || "please shedule a meeting" || "please shedule a meet" || 'shedule a meet'  || 'shedule a meet' || 'shedule meet'
     ) {
 
       // MeetAlert();
@@ -440,46 +435,50 @@ setTimeout(() => {
 
   useEffect(() => {
     console.log("This id");
-// Clean up the interval when the component unmounts
-    // return () => clearInterval(intervalId);
-  }, []);
-
-
-
-  
-
-
-  
-  useEffect(() => {
-    const speech = new Speech();
-    const Timesp = "Hello, how are you?";
-
-    const speakText = () => {
-      setTimeout(() => {
-        speech.speak({
-          text: Timesp
-        });
-      }, 5000);
-    };
-
-    speech.init().then(() => {
-      speakText();
-    });
-
-    return () => {
-      speech.cancel();
-    };
-  }, []);
-
-
-
 
  
+    
+
+   
+
+    // Clean up the interval when the component unmounts
+    // return () => clearInterval(intervalId);
+
+    if ("what is the purpose of your visit?") {
+      startListening();
+    }
+  }, []);
+
+
+
+  const speakText = () => {
+    setSp("What is the purpose of your visit?");
+  
+    console.log("This is voice " + AllVoice);
+    const meetingPurposeSpeech = new SpeechSynthesisUtterance(Timesp);
+    window.speechSynthesis.speak(meetingPurposeSpeech);
+  };
+   
+  useEffect(()=>{
+
+    setTimeout(() => {
+      speakText()
+    }, 10000);
+
+  },[])
+
+
+
 
 
   /*/ Meet sheduling/*/
 
-
+  useEffect(() => {
+    if (Talk === "please shedule meet") {
+      console.log("Give answer to meet");
+      MeetAlert();
+    }
+  }, []);
 
   const Navigation = () => {
     // navigate('/NotRes')
