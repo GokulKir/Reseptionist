@@ -20,6 +20,7 @@ import {
   VoiceData,
   Question,
   ListUsers,
+  PorposeOfVisit,
 } from "../../Recoil/recoil";
 import { Icon } from "@iconify/react";
 import MovingText from "react-moving-text";
@@ -27,8 +28,13 @@ import { useFaceDetection } from "react-use-face-detection";
 import Swal from "sweetalert2";
 import { useSocket } from "../../Context/SocketContext";
 import moment from "moment";
-import {preferedText,wishingPage,visitPurpose} from '../../constant/TextConstatnt'
-
+// import axios from 'axios'
+import {
+  preferedText,
+  wishingPage,
+  visitPurpose,
+} from "../../constant/TextConstatnt";
+import axios from '../../utils/axios'
 const Logo = require("../../assets/Robo.png");
 const Robo = require("../../assets/Logo.png");
 
@@ -40,23 +46,25 @@ function Responce() {
   const [Talk, setTalk] = useState("");
   const [Typed, setTyped] = useState();
   const [Qa, setQa] = useRecoilState(Question);
-  const [condition, setcondition] = useState(
-    preferedText
-  );
-  
+  const [condition, setcondition] = useState(preferedText);
 
   const [selection, setSelection] = useState(0);
   const [givenName, setgivenName] = useState();
   const [giventime, setgivenTime] = useState();
   const [listUsers, setListUsers] = useRecoilState(ListUsers);
+  const [purposeOfVisit, setPorposeOfVisit] = useRecoilState(PorposeOfVisit);
+ const purposeOfVisitValue = useRecoilValue(PorposeOfVisit)
+
   const [ta, setTa] = useState("meet a");
   const navigate = useNavigate();
   const [DisplayName, setDisplayName] = useState(null);
   const speech = new Speech();
   const id = useId();
   const [data, setData] = useState();
-  const [OnetimeSpeak, setOnetimeSpeak] = useState(true)
+  const [OnetimeSpeak, setOnetimeSpeak] = useState(true);
   const socket = useSocket();
+  const [meetAlert, setMeetAlert] = useState(true);
+  const [oneTimeAlert, setOneTimeAlert] = useState(true);
 
   useEffect(() => {
     const currentTime = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -75,11 +83,8 @@ function Responce() {
     //   const jsonData = JSON.parse(data);
     //   console.log("API Response:", jsonData);
 
-
     //     // Handle the API response here
     //   });
-
-
 
     //   // socket.emit("payload", { message: currentTime });
 
@@ -89,52 +94,40 @@ function Responce() {
     //   // });
     // });
 
-    const callUser = ()=>{
+    const callUser = () => {
       socket.on("userList", (data) => {
         // const jsonData = JSON.parse(data);
         // const { allUser } = jsonData;
         // setData(allUser);
-  
+
         const userJson = JSON.parse(data);
-        setData(userJson)
+        setData(userJson);
         console.log("API Response:", userJson);
       });
-    }
+    };
     socket.emit("getAllUsers", { message: "Hello from the client" });
-setTimeout(() => {
-  callUser()
-}, 1000);
-
+    setTimeout(() => {
+      callUser();
+    }, 1000);
   }, []);
 
   useEffect(() => {
     if (data) {
       // const foundUser = data.find((user) => user?.display_name === "Harish");
 
-      const foundUser = data.find(obj => obj.display_name.includes(Talk));
-      console.log(data);
-
-      console.log('====================================');
-      console.log(foundUser);
-      console.log('====================================');
-
+      const foundUser = data.find((obj) => obj.display_name.includes(Talk));
+      console.log(data, "😯");
       if (
         foundUser ||
         `meet a ${foundUser}` ||
         `meet sheduled a ${foundUser}`
       ) {
-        console.log('====================================');
-        console.log('🤒');
-        console.log('====================================');
         AlertBox();
         setgivenName(foundUser?.display_name);
         // console.log("Matched userData", display_name);
       }
     }
-  }, [data,Talk])
-  
-
-
+  }, [data, Talk]);
 
   useEffect(() => {
     console.log(listUsers, "listUsers");
@@ -153,7 +146,8 @@ setTimeout(() => {
     setSelection(0);
   };
 
-  const MeetAlert = () => {
+  const MeetAlert = async () => {
+    setMeetAlert(false);
     const confirmed = new SpeechSynthesisUtterance(condition);
     window.speechSynthesis.speak(confirmed);
 
@@ -169,14 +163,12 @@ setTimeout(() => {
 
     setTimeout(() => {
       navigate("/NotRes");
-      
     }, 9000);
 
     if (givenName) {
       AlertBox();
     }
   };
-
 
   const AlertBox = () => {
     if (givenName === Talk) {
@@ -260,11 +252,22 @@ setTimeout(() => {
 
   const startListening = async () => {
     await SpeechRecognition.startListening();
-    console.log(transcript);
     setTalk(transcript);
 
-    console.log(transcript);
+    if (meetAlert && transcript.length > 0 && oneTimeAlert) {
+      console.log(transcript, "🫥");
+      setPorposeOfVisit(transcript);
+      setTimeout(() => {
+        setOneTimeAlert(false);
+      }, 9000);
+    }
   };
+
+  useEffect(() => {
+    if (!oneTimeAlert) {
+      MeetAlert();
+    }
+  }, [oneTimeAlert]);
 
   useEffect(() => {
     const text = "meet";
@@ -316,7 +319,6 @@ setTimeout(() => {
   //     speakText();
   //   }, 1000);
 
-
   //   // Clean up the interval when the component unmounts
   //   // return () => clearInterval(intervalId);
 
@@ -325,57 +327,53 @@ setTimeout(() => {
   //   }
   // }, []);
 
+  useEffect(() => {
+    const speakText = () => {
+      // setSp(visitPurpose);
+      console.log("This is voice 🤢😈🤐" + AllVoice);
+      const speech = new Speech();
+      speech
+        .init({
+          volume: 0.5,
+          lang: "en-GB",
+          text: Timesp,
+          rate: 1,
+          pitch: 1,
+          voice: "Google UK English Female",
+          splitSentences: false,
+          listeners: {
+            onvoiceschanged: (voices) => {
+              console.log("Voices changed", voices);
+            },
+          },
+        })
+        .then(() => {
+          console.log("Text spoken successfully");
+        })
+        .catch((e) => {
+          console.error("Failed to speak text:", e);
+        });
+      // const mettingPurposeSpeach = new SpeechSynthesisUtterance(Timesp,()=>{
+      //   console.log('====================================');
+      //   console.log('INITIAL LOG******');
 
+      //   console.log('====================================');
+      // });
+      // window.speechSynthesis.speak(mettingPurposeSpeach);
+      setOnetimeSpeak(false);
+    };
+    if (OnetimeSpeak) {
+      setTimeout(() => {
+        speakText();
+      }, 1000);
+    }
+    // setTimeout(() => {
+    // }, 1000);
 
-
-useEffect(() => {
-  const speakText = () => {
-    setSp(visitPurpose);
-    console.log("This is voice 🤢😈🤐" + AllVoice);
-    const speech = new Speech();
-  speech
-    .init({
-      volume: 0.5,
-      lang: "en-GB",
-      text: Timesp,
-      rate: 1,
-      pitch: 1,
-      'voice':'Google UK English Female',
-      'splitSentences': false,
-      listeners: {
-        onvoiceschanged: voices => {
-          console.log("Voices changed", voices);
-        }
-      }
-    }).then(() => {
-      console.log("Text spoken successfully");
-    })
-    .catch((e) => {
-      console.error("Failed to speak text:", e);
-    });
-    // const mettingPurposeSpeach = new SpeechSynthesisUtterance(Timesp,()=>{
-    //   console.log('====================================');
-    //   console.log('INITIAL LOG******');
-
-    //   console.log('====================================');
-    // });
-    // window.speechSynthesis.speak(mettingPurposeSpeach);
-    setOnetimeSpeak(false)
-  };
-if(OnetimeSpeak){
-  speakText();
-}
-  // setTimeout(() => {
-  // }, 1000);
-
-  if (visitPurpose) {
-    startListening();
-  }
-}, []);
-
-
-
-
+    if (visitPurpose) {
+      startListening();
+    }
+  }, []);
 
   /*/ Meet sheduling/*/
 
