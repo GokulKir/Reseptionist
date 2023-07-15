@@ -15,12 +15,13 @@ import { useRecoilState } from "recoil";
 import { ListUsers, VoiceAssist } from "../../Recoil/recoil";
 import mqtt, { log } from "mqtt/dist/mqtt";
 import { useSocket } from "../../Context/SocketContext";
+import {wishingPage} from '../../constant/TextConstatnt'
 
 const Logo = require("../../assets/Robo.png");
 const Robo = require("../../assets/Logo.png");
 
 function Talk() {
-  const [sp, setSp] = useState("Hello there , How can i help you today?");
+  const [sp, setSp] = useState(wishingPage);
   const [talk, setTalk] = useState();
   const [VoiceAssistant, setVoiceAssistant] = useRecoilState(VoiceAssist);
   const navigate = useNavigate();
@@ -51,16 +52,22 @@ function Talk() {
 
   useEffect(() => {
     socket.on("message", (data) => {
-      console.log(data, "Socket data");
+      //   console.log(data, "Socket data");
       const jsonData = JSON.parse(data);
-      console.log("JSON data", jsonData);
+      //   console.log("JSON data", jsonData);
       const { user } = jsonData;
       console.log("User******", user);
+      if (user.user == "Unknown") {
+        setDisplatName("Unknown");
+        return;
+      }
+      console.log("User******", user.display_name);
+
       setDisplatName(user.display_name);
     });
 
     axios
-      .get("https://hubo2.domainenroll.com/api/v1/test")
+      .get("https://hubo2.domainenroll.com/api/v1/all-users")
       .then((response) => {
         console.log(response.data);
       })
@@ -98,6 +105,48 @@ function Talk() {
           speakAfterDelay();
         });
 
+
+      if (DisplatName === "Unknown") {
+        navigate("/Responce");
+        //   let responce = new SpeechSynthesisUtterance("Hello" + DisplatName);
+        const textToSpeach = (data) => {
+          const speech = new Speech();
+
+          console.log("====================================");
+          console.log("im in with 😮", data);
+          console.log("====================================");
+          const speakAfterDelay = () => {
+            setTimeout(() => {
+              speech.speak({
+                text: data,
+              });
+            }, 5000);
+          };
+
+          speech.init().then(() => {
+            speakAfterDelay();
+          });
+
+          // Cleanup function
+          return () => {
+            speech.cancel();
+          };
+        };
+
+        if (DisplatName === "Unknown") {
+          // window.speechSynthesis.speak(responce);
+          navigate("/responce");
+        } else {
+          if (DisplatName) {
+            textToSpeach("Hello" + DisplatName);
+          }
+          // window.speechSynthesis.speak(responce);
+        }
+        //   new SpeechSynthesisUtterance("");
+
+        //   setDisplatName(null);
+      }
+
         // Cleanup function
         return () => {
           speech.cancel();
@@ -116,6 +165,7 @@ function Talk() {
       //   new SpeechSynthesisUtterance("");
 
       //   setDisplatName(null);
+
     } catch (error) {
       console.log(error.message);
     }
@@ -135,24 +185,6 @@ function Talk() {
   // }, [])://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.4&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1ym1';
   // const User = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.3&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1yt3';
 
-  const ResponceP = () => {
-    const ResponceP = () => {
-      console.log("Responce");
-      const speech = new Speech();
-
-      speech
-        .speak({
-          text: sp,
-        })
-        .then(() => {
-          console.log("Text spoken successfully");
-        })
-        .catch((e) => {
-          console.error("Failed to speak text:", e);
-        });
-      navigate("/Responce");
-    };
-  };
   const {
     transcript,
     interimTranscript,
@@ -167,7 +199,6 @@ function Talk() {
 
   const ResponcePage = () => {
     const speech = new Speech();
-
     speech
       .speak({
         text: sp,
@@ -178,10 +209,8 @@ function Talk() {
       .catch((e) => {
         console.error("Failed to speak text:", e);
       });
-    navigate("/Responce");
+    navigate("/responce");
   };
-
-  const Message = async () => {};
 
   const startRecord = async () => {
     await SpeechRecognition.startListening();
@@ -203,10 +232,8 @@ function Talk() {
       if (Talking) {
         window.speechSynthesis.speak(Talking);
       }
-
       setSp("");
-
-      navigate("/Responce");
+      navigate("/responce");
     }
   };
 

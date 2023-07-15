@@ -4,6 +4,7 @@ import Talk from "./Components/Pages/Talk";
 import Responce from "./Components/Pages/Responce";
 import NotRes from "./Components/Pages/NotRes";
 import Conditions from "./Components/Pages/Conditions";
+import ExampleComponent from "./Components/Pages/ExampleComponent";
 import ContactForm from "./Components/Pages/ContactForm"
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
@@ -29,10 +30,11 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Talk />}></Route>
-            <Route path="Responce" element={<Responce />}></Route>
+            <Route path="responce" element={<Responce />}></Route>
             <Route path="NotRes" element={<NotRes />}></Route>
             <Route path="contactform" element={<ContactForm />}></Route>
             <Route path="Conditions" element={<Conditions />}></Route>
+            <Route path="test" element={<ExampleComponent />}></Route>
           </Routes>
         </BrowserRouter>
       </SocketProvider>

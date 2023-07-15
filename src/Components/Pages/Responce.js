@@ -27,24 +27,25 @@ import { useFaceDetection } from "react-use-face-detection";
 import Swal from "sweetalert2";
 import { useSocket } from "../../Context/SocketContext";
 import moment from "moment";
-import Say from 'react-say';
 
+import {preferedText,wishingPage,visitPurpose} from '../../constant/TextConstatnt'
 
 
 const Logo = require("../../assets/Robo.png");
 const Robo = require("../../assets/Logo.png");
 
 function Responce() {
-  const [sp, setSp] = useState("Hello there , How can i help you today?");
-  const [Timesp, setTimeSp] = useState("What is the purpose of your visit?");
+  const [sp, setSp] = useState(wishingPage);
+  const [Timesp, setTimeSp] = useState(visitPurpose);
   const [AllVoice, setAllVoice] = useRecoilState(VoiceAssist);
   const [Voicedata, setVoicedata] = useRecoilState(VoiceData);
   const [Talk, setTalk] = useState("");
   const [Typed, setTyped] = useState();
   const [Qa, setQa] = useRecoilState(Question);
   const [condition, setcondition] = useState(
-    "Which employee would you prefered to?"
+    preferedText
   );
+  
 
   const [selection, setSelection] = useState(0);
   const [givenName, setgivenName] = useState();
@@ -57,6 +58,7 @@ function Responce() {
   const [DisplayName, setDisplayName] = useState(null);
   const id = useId();
   const [data, setData] = useState();
+  const [OnetimeSpeak, setOnetimeSpeak] = useState(true)
   const socket = useSocket();
 
 
@@ -272,13 +274,9 @@ setTimeout(() => {
    //API Calling single user//
 
 
+
   
 
-useEffect(()=> {
-  
-},[])
-
-  useEffect(() => {}, []);
 
   useEffect(() => {
     console.log(listUsers, "listUsers");
@@ -305,7 +303,18 @@ useEffect(()=> {
     const confirmed = new SpeechSynthesisUtterance(condition);
     window.speechSynthesis.speak(confirmed);
 
+    Swal.fire({
+      title: condition,
+      text: "Please name the person?",
+      icon: "question",
+      confirmButtonText: "Cancel",
+      timer: 9000,
+    }).then((res) => {
+      console.log("responce", res);
+    });
+
     setEmselection(true)
+
 
     // Swal.fire({
     //   title: "Which employee would you prefered to?",
@@ -322,9 +331,6 @@ useEffect(()=> {
       
     // }, 9000);
   };
-
-
-
 
 
   const AlertBox = () => {
@@ -434,6 +440,82 @@ useEffect(()=> {
     startListening();
   }, [startListening]);
 
+
+  // useEffect(() => {
+  //   console.log("This id");
+
+  //   const speakText = () => {
+  //     setSp(visitPurpose)
+  //     console.log("This is voice " + AllVoice);
+  //     const mettingPurposeSpeach = new SpeechSynthesisUtterance(Timesp);
+  //     window.speechSynthesis.speak(mettingPurposeSpeach);
+  //   };
+  //   // speakText()
+
+  //   // const intervalId = setInterval(speakText, 10000);
+
+  //   setTimeout(() => {
+  //     speakText();
+  //   }, 1000);
+
+
+  //   // Clean up the interval when the component unmounts
+  //   // return () => clearInterval(intervalId);
+
+  //   if (visitPurpose) {
+  //     startListening();
+  //   }
+  // }, []);
+
+
+
+
+useEffect(() => {
+  const speakText = () => {
+    setSp(visitPurpose);
+    console.log("This is voice 🤢😈🤐" + AllVoice);
+    const speech = new Speech();
+  speech
+    .init({
+      volume: 0.5,
+      lang: "en-GB",
+      text: Timesp,
+      rate: 1,
+      pitch: 1,
+      'voice':'Google UK English Female',
+      'splitSentences': false,
+      listeners: {
+        onvoiceschanged: voices => {
+          console.log("Voices changed", voices);
+        }
+      }
+    }).then(() => {
+      console.log("Text spoken successfully");
+    })
+    .catch((e) => {
+      console.error("Failed to speak text:", e);
+    });
+    // const mettingPurposeSpeach = new SpeechSynthesisUtterance(Timesp,()=>{
+    //   console.log('====================================');
+    //   console.log('INITIAL LOG******');
+
+    //   console.log('====================================');
+    // });
+    // window.speechSynthesis.speak(mettingPurposeSpeach);
+    setOnetimeSpeak(false)
+  };
+if(OnetimeSpeak){
+  speakText();
+}
+  // setTimeout(() => {
+  // }, 1000);
+
+  if (visitPurpose) {
+    startListening();
+  }
+}, []);
+
+
   useEffect(() => {
     console.log("This id");
 
@@ -442,13 +524,8 @@ useEffect(()=> {
 
    
 
-    // Clean up the interval when the component unmounts
-    // return () => clearInterval(intervalId);
 
-    if ("what is the purpose of your visit?") {
-      startListening();
-    }
-  }, []);
+
 
 
 
