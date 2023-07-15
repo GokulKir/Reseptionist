@@ -238,7 +238,7 @@ function ContactForm() {
   const [data, setData] = useState("Department");
   const [userData, setUserData] = useState("");
   const [Spe, setSpe] = useState(
-    "I am sorry , but couldn't catch you . Could you please select the concerned from the drop down list on the Tab next to me"
+    "could you please fill the form?"
   );
   const [userLIST, setUserList] = useState(FullData);
 
@@ -338,8 +338,7 @@ function ContactForm() {
   useEffect(() => {
     if (
       Spe ===
-      "I am sorry , but couldn't catch you . Could you please select the concerned from the drop down list on the Tab next to me"
-    ) {
+      "could you please fill the form?" ) {
       const confirmed = new SpeechSynthesisUtterance(Spe);
       window.speechSynthesis.speak(confirmed);
 
@@ -349,11 +348,10 @@ function ContactForm() {
 
   return (
     <div className="">
-      <div className="flex justify-center">
+      <div className="flex justify-center mb-5">
         <div className="w-11/12 h-[80px] bg-orange-500 mt-[20px]  rounded  ">
           <p className="text-white mt-2 ml-3 text-[14px] md:text-[18px] font-light">
-            I am sorry , but couldn't catch you . Could you please select the
-            concerned from the drop down list on the Tab next to me.
+          could you please fill the form?
           </p>
         </div>
       </div>
@@ -361,7 +359,7 @@ function ContactForm() {
       
       <div class="flex justify-center">
             {/* <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">First name</label> */}
-            <input  type="text" id="first_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block three p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 w-11/12" placeholder="John" required />
+            <input  type="text" id="first_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block three p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 w-11/12" placeholder="Enter your name here" required />
         </div>
       
 

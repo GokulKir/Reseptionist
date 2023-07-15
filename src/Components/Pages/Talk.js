@@ -15,12 +15,13 @@ import { useRecoilState } from "recoil";
 import { ListUsers, VoiceAssist } from "../../Recoil/recoil";
 import mqtt, { log } from "mqtt/dist/mqtt";
 import { useSocket } from "../../Context/SocketContext";
+import {wishingPage} from '../../constant/TextConstatnt'
 
 const Logo = require("../../assets/Robo.png");
 const Robo = require("../../assets/Logo.png");
 
 function Talk() {
-  const [sp, setSp] = useState("Hello there , How can i help you today?");
+  const [sp, setSp] = useState(wishingPage);
   const [talk, setTalk] = useState();
   const [VoiceAssistant, setVoiceAssistant] = useRecoilState(VoiceAssist);
   const navigate = useNavigate();
@@ -48,6 +49,11 @@ function Talk() {
       const jsonData = JSON.parse(data);
       //   console.log("JSON data", jsonData);
       const { user } = jsonData;
+      console.log("User******", user);
+      if (user.user == "Unknown") {
+        setDisplatName("Unknown");
+        return;
+      }
       console.log("User******", user.display_name);
 
       setDisplatName(user.display_name);
@@ -69,43 +75,51 @@ function Talk() {
     console.log("====================================");
 
     try {
-      //   let responce = new SpeechSynthesisUtterance("Hello" + DisplatName);
-      const textToSpeach = (data) => {
-        const speech = new Speech();
-
-        console.log("====================================");
-        console.log("im in with 😮", data);
-        console.log("====================================");
-        const speakAfterDelay = () => {
-          setTimeout(() => {
-            speech.speak({
-              text: data,
-            });
-          }, 5000);
-        };
-
-        speech.init().then(() => {
-          speakAfterDelay();
-        });
-
-        // Cleanup function
-        return () => {
-          speech.cancel();
-        };
-      };
+      const responce = new SpeechSynthesisUtterance("Hello" + DisplatName);
+      if (DisplatName) {
+        window.speechSynthesis.speak(responce);
+      }
 
       if (DisplatName === "Unknown") {
-        // window.speechSynthesis.speak(responce);
-        navigate("/responce");
-      } else {
-        if (DisplatName) {
-          textToSpeach("Hello" + DisplatName);
-        }
-        // window.speechSynthesis.speak(responce);
-      }
-      //   new SpeechSynthesisUtterance("");
+        navigate("/Responce");
+        //   let responce = new SpeechSynthesisUtterance("Hello" + DisplatName);
+        const textToSpeach = (data) => {
+          const speech = new Speech();
 
-      //   setDisplatName(null);
+          console.log("====================================");
+          console.log("im in with 😮", data);
+          console.log("====================================");
+          const speakAfterDelay = () => {
+            setTimeout(() => {
+              speech.speak({
+                text: data,
+              });
+            }, 5000);
+          };
+
+          speech.init().then(() => {
+            speakAfterDelay();
+          });
+
+          // Cleanup function
+          return () => {
+            speech.cancel();
+          };
+        };
+
+        if (DisplatName === "Unknown") {
+          // window.speechSynthesis.speak(responce);
+          navigate("/responce");
+        } else {
+          if (DisplatName) {
+            textToSpeach("Hello" + DisplatName);
+          }
+          // window.speechSynthesis.speak(responce);
+        }
+        //   new SpeechSynthesisUtterance("");
+
+        //   setDisplatName(null);
+      }
     } catch (error) {
       console.log(error.message);
     }
