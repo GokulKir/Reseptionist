@@ -298,13 +298,17 @@ function Responce() {
         });
       }, 4000);
 
-      setTimeout(() => {
-        if (nameConformation) {
+     let nameNotRecognized = setTimeout(() => {
+        if (!nameConformation) {
           navigate("/NotRes");
         }
       }, 20000);
+      if (nameConformation) {
+        clearTimeout(nameNotRecognized);
+      }
+
     }
-  }, [nameTranscribe]);
+  }, [nameTranscribe,nameConformation]);
 
   useEffect(() => {
     if (userData.length > 0) {
@@ -489,7 +493,7 @@ function Responce() {
               </div>
             )}
             {userNameConfirmation && (
-              <div className="flex justify-center mt-[30px]">
+              <div className="flex justify-between mt-[30px]">
                 <Button
                   onClick={() => setEmselection(false)}
                   text="Cancel"
