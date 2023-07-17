@@ -33,3 +33,8 @@ export const ListUsers = atom({
   key : "listUsers",
   default : []
 })
+
+export const PorposeOfVisit = atom({
+  key : "listUsers",
+  default : ""
+})

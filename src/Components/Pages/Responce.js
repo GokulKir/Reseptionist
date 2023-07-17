@@ -20,6 +20,7 @@ import {
   VoiceData,
   Question,
   ListUsers,
+  PorposeOfVisit,
 } from "../../Recoil/recoil";
 import { Icon } from "@iconify/react";
 import MovingText from "react-moving-text";
@@ -27,10 +28,14 @@ import { useFaceDetection } from "react-use-face-detection";
 import Swal from "sweetalert2";
 import { useSocket } from "../../Context/SocketContext";
 import moment from "moment";
-
-import {preferedText,wishingPage,visitPurpose} from '../../constant/TextConstatnt'
-
-
+// import axios from 'axios'
+import {
+  preferedText,
+  wishingPage,
+  visitPurpose,
+} from "../../constant/TextConstatnt";
+// import axios from "../../utils/axios";
+import { SingleUserByName } from "../../api/apiCalls";
 const Logo = require("../../assets/Robo.png");
 const Robo = require("../../assets/Logo.png");
 
@@ -42,151 +47,30 @@ function Responce() {
   const [Talk, setTalk] = useState("");
   const [Typed, setTyped] = useState();
   const [Qa, setQa] = useRecoilState(Question);
-  const [condition, setcondition] = useState(
-    preferedText
-  );
-  
+  const [condition, setcondition] = useState(preferedText);
 
   const [selection, setSelection] = useState(0);
   const [givenName, setgivenName] = useState();
   const [giventime, setgivenTime] = useState();
   const [listUsers, setListUsers] = useRecoilState(ListUsers);
-  const [EmSelection , setEmselection] = useState(false) 
-  const [ConfirmSelection , setConfirmselection] = useState(false)
+  const [purposeOfVisit, setPorposeOfVisit] = useRecoilState(PorposeOfVisit);
+  const purposeOfVisitValue = useRecoilValue(PorposeOfVisit);
+
   const [ta, setTa] = useState("meet a");
   const navigate = useNavigate();
   const [DisplayName, setDisplayName] = useState(null);
   const id = useId();
   const [data, setData] = useState();
-  const [OnetimeSpeak, setOnetimeSpeak] = useState(true)
+  const [OnetimeSpeak, setOnetimeSpeak] = useState(true);
   const socket = useSocket();
-
-
-
-  const PersonName = () => {
-    return (
-    
-
-  <div class="backdrop-blursm bg-black  inset-0 backdrop-blur-sm bg-opacity-25 fixed justify-center items-center flex ">
-     <div className="flex justify-center  w-[450px] h-[290px] bg-white rounded shadow ">
-
-      <div className="mt-[40px]">
-        <div className="flex justify-center">
-
-      <Icon className="w-[60px] h-[60px] " color="FB8C00" icon="fluent:person-32-filled" />
-
-      </div>
-
-      <div className="mt-[50px]">
-        
-        <p className="text-[16px] text-black  font-bold">Which employe would you prefered to ?</p>
-        
-        </div>
-
-
-        <div className="flex justify-center mt-[30px]">
-        <Button onClick={()=> setEmselection(false)} text='Cancel' className="w-[120px] h-[41px] flex  border-2   border-orange-600 content-center justify-center ">
- 
-          <p className="text-stone-950 mt-[-9px]">Cancel</p>
-          
-          </Button>          
-        </div>
-
-      </div>
-
-     
-
-      <div>
-
-      </div>
-
-
-
-
-
-
-
-
-
-
-
-
-      
-
-{/* 
-      <div className="mt-[20px] ">
-
-<p>Which employee would you prefered to?</p>
-
-
-
-</div> */}
-
-
-     </div>
-
-
-  </div>
-       
-    
-    )
-   }
-
-
-
-   const ConfirmSpeak = () => {
-    return (
-      <div class="backdrop-blursm bg-black  inset-0 backdrop-blur-sm bg-opacity-25 fixed justify-center items-center flex ">
-
-
-<div className="flex justify-center  w-[450px] h-[290px] bg-white rounded shadow ">
-
-<div className="mt-[40px] ">
-  <div className="flex justify-center">
-
-<Icon className="w-[60px] h-[60px] " color="FB8C00" icon="fluent:person-32-filled" />
-
-</div>
-
-<div className="mt-[50px]">
-  
-  <p className="text-[16px] text-black  font-bold">Let me confirm, so you are here to meet {givenName}</p>
-  
-  </div>
-
-   <div className="flex ">
-  <div className="flex justify-center mt-[30px] flex-row ">
-  <Button onClick={()=> setEmselection(false)} text='Cancel' className="w-[120px] h-[41px] flex  border-2   border-green-500  content-center justify-center ">
-
-    <p className="text-stone-950 mt-[-9px]">Yes</p>
-    
-    </Button>     
-
-
-
-     <Button onClick={()=> setEmselection(false)} text='Cancel' className="w-[120px] h-[41px] flex  border-2   border-red-500  content-center justify-center  ml-[70px]">
-
-    <p className="text-stone-950 mt-[-9px]">No</p>
-    
-    </Button>      
-  </div>
-
-  </div>
-
-</div>
-
-
-
-<div>
-</div>
-</div>
-        
-      </div>
-    )
-   }
- 
- 
-
+  const [meetAlert, setMeetAlert] = useState(true);
+  const [oneTimeAlert, setOneTimeAlert] = useState(true);
+  const [EmSelection, setEmselection] = useState(false);
+  const [nameTranscribe, setNameTranscribe] = useState("");
+  const [userData, setUserData] = useState([]);
+  const [userdisplayName, setUserdisplayName] = useState("");
+  const [userNameConfirmation, setUserNameConfirmation] = useState(false);
+  const [nameConformation, setNameConformation] = useState(false);
   useEffect(() => {
     const currentTime = moment().format("YYYY-MM-DD HH:mm:ss");
 
@@ -204,11 +88,8 @@ function Responce() {
     //   const jsonData = JSON.parse(data);
     //   console.log("API Response:", jsonData);
 
-
     //     // Handle the API response here
     //   });
-
-
 
     //   // socket.emit("payload", { message: currentTime });
 
@@ -218,50 +99,35 @@ function Responce() {
     //   // });
     // });
 
-
-   
-  
- //API Calling single user//
-  
-
-    const callUser = ()=>{
+    const callUser = () => {
       socket.on("userList", (data) => {
         // const jsonData = JSON.parse(data);
         // const { allUser } = jsonData;
         // setData(allUser);
-  
+
         const userJson = JSON.parse(data);
-        setData(userJson)
+        setData(userJson);
         console.log("API Response:", userJson);
       });
-    }
+    };
     socket.emit("getAllUsers", { message: "Hello from the client" });
-setTimeout(() => {
-  callUser()
-}, 1000);
-
+    setTimeout(() => {
+      callUser();
+    }, 1000);
   }, []);
 
   useEffect(() => {
     if (data) {
       // const foundUser = data.find((user) => user?.display_name === "Harish");
 
-      const foundUser = data.find(obj => obj.display_name.includes(Talk));
-      console.log(data);
-
-      console.log('====================================');
-      console.log(foundUser);
-      console.log('====================================');
-
+      const foundUser = data.find((obj) => obj.display_name.includes(Talk));
+      console.log(data, "😯");
       if (
         foundUser ||
         `meet a ${foundUser}` ||
         `meet sheduled a ${foundUser}`
       ) {
-        console.log('====================================');
-        console.log('🤒');
-        console.log('====================================');
-        setEmselection(true)
+        AlertBox();
         setgivenName(foundUser?.display_name);
 
       const confirmed = new SpeechSynthesisUtterance("Condacting" + foundUser.display_name);
@@ -269,14 +135,7 @@ setTimeout(() => {
         // console.log("Matched userData", display_name);
       }
     }
-  }, [data])
-
-   //API Calling single user//
-
-
-
-  
-
+  }, [data, Talk]);
 
   useEffect(() => {
     console.log(listUsers, "listUsers");
@@ -297,9 +156,8 @@ setTimeout(() => {
     setSelection(0);
   };
 
-
-
-  const MeetAlert = () => {
+  const MeetAlert = async () => {
+    setMeetAlert(false);
     const confirmed = new SpeechSynthesisUtterance(condition);
     window.speechSynthesis.speak(confirmed);
 
@@ -313,25 +171,14 @@ setTimeout(() => {
       console.log("responce", res);
     });
 
-    setEmselection(true)
+    setTimeout(() => {
+      navigate("/NotRes");
+    }, 9000);
 
-
-    // Swal.fire({
-    //   title: "Which employee would you prefered to?",
-    //   text: "Please name the person?",
-    //   icon: "question",
-    //   confirmButtonText: "Cancel",
-    //   timer: 9000,
-    // }).then((res) => {
-    //   console.log("responce", res);
-    // });
-
-    // setTimeout(() => {
-    //   navigate("/NotRes");
-      
-    // }, 9000);
+    if (givenName) {
+      AlertBox();
+    }
   };
-
 
   const AlertBox = () => {
       Swal.fire({
@@ -414,14 +261,88 @@ setTimeout(() => {
 
   const startListening = async () => {
     await SpeechRecognition.startListening();
-    console.log(transcript);
     setTalk(transcript);
+    if (transcript.length > 0) {
+      setNameTranscribe(transcript);
+    }
 
-    console.log(transcript);
+    if (meetAlert && transcript.length > 0 && oneTimeAlert) {
+      console.log(transcript, "🫥");
+      setPorposeOfVisit(transcript);
+      setTimeout(() => {
+        setOneTimeAlert(false);
+      }, 9000);
+    }
   };
 
   useEffect(() => {
-    const text = "meet a person";
+    if (EmSelection && !userNameConfirmation) {
+      const confirmed = new SpeechSynthesisUtterance(condition);
+      window.speechSynthesis.speak(confirmed);
+    }
+  }, [EmSelection]);
+
+  useEffect(() => {
+    if (userNameConfirmation) {
+      const confirmed = new SpeechSynthesisUtterance(
+        `Do you want to meet with ${userdisplayName}`
+      );
+      window.speechSynthesis.speak(confirmed);
+    }
+  }, [userNameConfirmation]);
+
+  useEffect(() => {
+    if (EmSelection) {
+      setTimeout(() => {
+        SingleUserByName(nameTranscribe).then((getUserData) => {
+          if (getUserData) {
+            setUserData(getUserData);
+          }
+        });
+      }, 4000);
+
+      setTimeout(() => {
+        if (nameConformation) {
+          navigate("/NotRes");
+        }
+      }, 20000);
+    }
+  }, [nameTranscribe]);
+
+  useEffect(() => {
+    if (userData.length > 0) {
+      setUserdisplayName(userData[0]?.display_name);
+    }
+  }, [userData]);
+  useEffect(() => {
+    if (userdisplayName) {
+      setEmselection(false);
+      setUserNameConfirmation(true);
+    }
+  }, [userdisplayName]);
+
+  useEffect(() => {
+    if (userNameConfirmation) {
+      if (nameTranscribe.toLowerCase().includes("yes")) {
+        navigate("/contactform");
+        setNameConformation(true);
+      }
+      if (nameTranscribe.toLowerCase().includes === "No") {
+        navigate("/NotRes");
+      }
+      // setUserNameConfirmation(false)
+    }
+  }, [userNameConfirmation, nameTranscribe]);
+
+  useEffect(() => {
+    if (!oneTimeAlert) {
+      setEmselection(true);
+    }
+  }, [oneTimeAlert]);
+
+  useEffect(() => {
+    const text = "meet";
+    let oneTimeAlertData = true;
 
     if ( text || text.includes("please meet a person") || text.includes("please shedule a meeting") || text.includes("please shedule a meet") || text.includes('shedule a meet') || text.includes('shedule a meet') || text.includes('shedule meet')
     ) {
@@ -429,7 +350,15 @@ setTimeout(() => {
       const confirmed = new SpeechSynthesisUtterance(condition);
       window.speechSynthesis.speak(confirmed);
       setcondition("");
-      MeetAlert();
+      // setEmselection(true);
+
+      // setTimeout(() => {
+      //   if(oneTimeAlertData){
+      //   const visitPurposeConfig = new SpeechSynthesisUtterance(visitPurpose);
+      //   window.speechSynthesis.speak(visitPurposeConfig);
+      //   }
+      //   oneTimeAlertData = false;
+      // }, 1000);
       // AlertBox()
     }
   }, []);
@@ -458,7 +387,6 @@ setTimeout(() => {
   //     speakText();
   //   }, 1000);
 
-
   //   // Clean up the interval when the component unmounts
   //   // return () => clearInterval(intervalId);
 
@@ -467,94 +395,52 @@ setTimeout(() => {
   //   }
   // }, []);
 
-
-
-
-useEffect(() => {
-  const speakText = () => {
-    setSp(visitPurpose);
-    console.log("This is voice 🤢😈🤐" + AllVoice);
-    const speech = new Speech();
-  speech
-    .init({
-      volume: 0.5,
-      lang: "en-GB",
-      text: Timesp,
-      rate: 1,
-      pitch: 1,
-      'voice':'Google UK English Female',
-      'splitSentences': false,
-      listeners: {
-        onvoiceschanged: voices => {
-          console.log("Voices changed", voices);
-        }
-      }
-    }).then(() => {
-      console.log("Text spoken successfully");
-    })
-    .catch((e) => {
-      console.error("Failed to speak text:", e);
-    });
-    // const mettingPurposeSpeach = new SpeechSynthesisUtterance(Timesp,()=>{
-    //   console.log('====================================');
-    //   console.log('INITIAL LOG******');
-
-    //   console.log('====================================');
-    // });
-    // window.speechSynthesis.speak(mettingPurposeSpeach);
-    setOnetimeSpeak(false)
-  };
-if(OnetimeSpeak){
-  speakText();
-}
-  // setTimeout(() => {
-  // }, 1000);
-
-  if (visitPurpose) {
-    startListening();
-  }
-}, []);
-
-
   useEffect(() => {
-    console.log("This id");
+    const speakText = () => {
+      // setSp(visitPurpose);
+      const speech = new Speech();
+      speech
+        .init({
+          volume: 0.5,
+          lang: "en-GB",
+          text: Timesp,
+          rate: 1,
+          pitch: 1,
+          voice: "Google UK English Female",
+          splitSentences: false,
+          listeners: {
+            onvoiceschanged: (voices) => {
+              // console.log("Voices changed", voices);
+            },
+          },
+        })
+        .then(() => {
+          console.log("Text spoken successfully");
+        })
+        .catch((e) => {
+          console.error("Failed to speak text:", e);
+        });
+      setOnetimeSpeak(false);
+    };
+    if (OnetimeSpeak) {
+      setTimeout(() => {
+        speakText();
+      }, 1000);
+    }
+    // setTimeout(() => {
+    // }, 1000);
 
- 
-    
-
-   
-
-
-
-
-
-
-  const speakText = () => {
-    setSp("What is the purpose of your visit?");
-  
-    console.log("This is voice " + AllVoice);
-    const meetingPurposeSpeech = new SpeechSynthesisUtterance(Timesp);
-    window.speechSynthesis.speak(meetingPurposeSpeech);
-  };
-   
-  useEffect(()=>{
-
-    setTimeout(() => {
-      speakText()
-    }, 10000);
-
-  },[])
-
-
-
-
+    if (visitPurpose) {
+      startListening();
+    }
+  }, []);
 
   /*/ Meet sheduling/*/
 
   useEffect(() => {
     if (Talk === "please shedule meet") {
       console.log("Give answer to meet");
-      MeetAlert();
+      // setEmselection(true);
     }
   }, []);
 
@@ -563,6 +449,70 @@ if(OnetimeSpeak){
     AlertBox();
   };
 
+  const PersonName = ({ condition, nameTranscribe, userNameConfirmation }) => {
+    return (
+      <div class="backdrop-blursm bg-black  inset-0 backdrop-blur-sm bg-opacity-25 fixed justify-center items-center flex ">
+        <div className="flex justify-center  w-[550px] h-[390px] bg-white rounded shadow ">
+          <div className="mt-[40px]">
+            <div className="flex justify-center">
+              <Icon
+                className="w-[60px] h-[60px] "
+                color="FB8C00"
+                icon="fluent:person-32-filled"
+              />
+            </div>
+
+            <div className="mt-[30px] mx-[20px]">
+              <p className="text-[16px] text-black  font-bold">{condition}</p>
+
+              <p className="text-[16px] text-black">{nameTranscribe}</p>
+            </div>
+
+            {!userNameConfirmation && (
+              <div className="flex justify-center mt-[30px]">
+                <Button
+                  onClick={() => setEmselection(false)}
+                  text="Cancel"
+                  className="w-[120px] h-[41px] flex  border-2   border-orange-600 content-center justify-center "
+                >
+                  <p className="text-stone-950 mt-[-9px]">Cancel</p>
+                </Button>
+              </div>
+            )}
+            {userNameConfirmation && (
+              <div className="flex justify-center mt-[30px]">
+                <Button
+                  onClick={() => setEmselection(false)}
+                  text="Cancel"
+                  className="w-[120px] h-[41px] flex  border-2   border-orange-600 content-center justify-center "
+                >
+                  <p className="text-stone-950 mt-[-9px]">Yes</p>
+                </Button>
+                <Button
+                  onClick={() => navigate("/NotRes")}
+                  text="Cancel"
+                  className="w-[120px] h-[41px] flex  border-2   border-orange-600 content-center justify-center "
+                >
+                  <p className="text-stone-950 mt-[-9px]">NO</p>
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div></div>
+
+          {/* 
+      <div className="mt-[20px] ">
+
+<p>Which employee would you prefered to?</p>
+
+
+
+</div> */}
+        </div>
+      </div>
+    );
+  };
   return (
     <div>
 
@@ -597,6 +547,7 @@ if(OnetimeSpeak){
           >
             {sp}
           </MovingText>
+          <p>{Talk}</p>
         </div>
       </div>
 
@@ -606,7 +557,7 @@ if(OnetimeSpeak){
         <div className=" flex  space-x-4 md:space-x-12  lg:space-x-10] ">
           <div className="w-[1px] md:w-2 lg:w-5 lg: flex   "></div>
           <Button
-            onClick={() => MeetAlert()}
+            onClick={() => setEmselection(true)}
             className="w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] bg-orange-600  content-center "
           >
             <h1 className="text-[8px]  md:text-[17px] ">To meet a person</h1>
@@ -621,25 +572,16 @@ if(OnetimeSpeak){
           </p>
         </Link>
       </div>
-
-
-      {ConfirmSelection === true  ?
-
-<ConfirmSpeak/>
-
- : null
-}
-
-
-{EmSelection === true  ?
-
-
-<PersonName/>
-
- : null
-}
-
-
+      {EmSelection === true ? (
+        <PersonName condition={condition} nameTranscribe={nameTranscribe} />
+      ) : null}
+      {userNameConfirmation && (
+        <PersonName
+          condition={`Do you want to meet with ${userdisplayName}`}
+          nameTranscribe={nameTranscribe}
+          userNameConfirmation
+        />
+      )}
     </div>
   );
 }

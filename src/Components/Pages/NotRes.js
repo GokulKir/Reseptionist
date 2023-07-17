@@ -10,13 +10,17 @@ import { useSocket } from "../../Context/SocketContext";
 import moment from "moment";
 import { noteResponce, FullData } from "../../constant/constant";
 import Speech from "speak-tts";
-
+import {PorposeOfVisit} from '../../Recoil/recoil'
+import { useRecoilState, useRecoilValue } from "recoil";
 function NotRes() {
   const navigate = useNavigate();
   const [Option, setOpation] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [useropen, setUserOpen] = React.useState(false);
 
+  // const [purposeOfVisit,setPorposeOfVisit] = useRecoilValue(PorposeOfVisit);
+
+ const purposeOfVisit = useRecoilValue(PorposeOfVisit)
   const [data, setData] = useState("Department");
   const [userData, setUserData] = useState("");
   const [Navigate, setNavigate] = useState(false)
@@ -138,6 +142,9 @@ function NotRes() {
 
       setSpe("");
     }
+    setformValue({
+      purpose_note:purposeOfVisit
+    })
   }, []);
 
   const setValue = (data, name) => {
@@ -147,8 +154,10 @@ function NotRes() {
     });
   };
 
+  
   useEffect(() => {
     console.log(formValue);
+
   }, [formValue]);
 
   return (
@@ -250,6 +259,7 @@ function NotRes() {
               setValue(e.target.value, e.target.name);
             }}
             id="purpose_note"
+            value={formValue.purpose_note}
             name="purpose_note"
             rows="4"
             class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"

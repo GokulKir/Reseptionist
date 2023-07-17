@@ -15,7 +15,8 @@ import { useRecoilState } from "recoil";
 import { ListUsers, VoiceAssist } from "../../Recoil/recoil";
 import mqtt, { log } from "mqtt/dist/mqtt";
 import { useSocket } from "../../Context/SocketContext";
-import {wishingPage} from '../../constant/TextConstatnt'
+import { wishingPage } from "../../constant/TextConstatnt";
+import { Icon } from "@iconify/react";
 
 const Logo = require("../../assets/Robo.png");
 const Robo = require("../../assets/Logo.png");
@@ -66,14 +67,7 @@ function Talk() {
       setDisplatName(user.display_name);
     });
 
-    axios
-      .get("https://hubo2.domainenroll.com/api/v1/all-users")
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  
   }, []);
 
 
