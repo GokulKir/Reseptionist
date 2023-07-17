@@ -46,7 +46,7 @@ function Talk() {
 
 
 
-
+ 
   
 
   useEffect(() => {
@@ -70,7 +70,9 @@ function Talk() {
   }, []);
 
 
-
+ useEffect(()=>{
+  
+ },[])
 
 
   useEffect(() => {

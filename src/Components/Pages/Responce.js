@@ -28,7 +28,7 @@ import Swal from "sweetalert2";
 import { useSocket } from "../../Context/SocketContext";
 import moment from "moment";
 import Say from 'react-say';
-
+import { TextToSpeech } from "./Voice/Speach";
 
 const Logo = require("../../assets/Robo.png");
 const Robo = require("../../assets/Logo.png");
@@ -60,6 +60,26 @@ function Responce() {
 
 
 
+
+  useEffect(() => {
+    const speak = () => {
+      setSp('What is the purpose of visit?')
+      const speech = new SpeechSynthesisUtterance();
+
+      speech.text = 'What is the purpose of visit?';
+      speech.volume = 1;
+      speech.rate = 1;
+      speech.pitch = 1;
+
+      window.speechSynthesis.speak(speech);
+    };
+
+    const timeoutId = setTimeout(speak, 8000);
+
+    return () => {
+      clearTimeout(timeoutId); 
+    };
+  }, []);
 
 
 
@@ -487,6 +507,7 @@ setTimeout(() => {
             {sp}
           </MovingText>
         </div>
+       
       </div>
 
 
