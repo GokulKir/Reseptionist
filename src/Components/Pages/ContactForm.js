@@ -8,6 +8,10 @@ import "react-dropdown-now/style.css";
 import "./ContactForm";
 import { useSocket } from "../../Context/SocketContext";
 import moment from "moment";
+import { PorposeOfVisit } from "../../Recoil/recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { noteResponce } from "../../constant/constant";
+
 import Speech from "speak-tts";
 
 const FullData = [
@@ -234,12 +238,11 @@ function ContactForm() {
   const [Option, setOpation] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [useropen, setUserOpen] = React.useState(false);
-
+  const purposeOfVisit = useRecoilValue(PorposeOfVisit);
+  const [formValue, setformValue] = useState(noteResponce);
   const [data, setData] = useState("Department");
   const [userData, setUserData] = useState("");
-  const [Spe, setSpe] = useState(
-    "could you please fill the form?"
-  );
+  const [Spe, setSpe] = useState("could you please fill the form?");
   const [userLIST, setUserList] = useState(FullData);
 
   const socket = useSocket();
@@ -274,7 +277,6 @@ function ContactForm() {
       name: "Manager department",
     },
   ];
-
 
   const handleOpen = () => {
     setOpen(!open);
@@ -336,38 +338,56 @@ function ContactForm() {
   };
 
   useEffect(() => {
-    if (
-      Spe ===
-      "could you please fill the form?" ) {
+    if (Spe === "could you please fill the form?") {
       const confirmed = new SpeechSynthesisUtterance(Spe);
       window.speechSynthesis.speak(confirmed);
 
       setSpe("");
     }
+    setformValue({
+      purpose_note: purposeOfVisit,
+    });
   }, []);
+  const setValue = (data, name) => {
+    setformValue({
+      ...formValue,
+      [name]: data,
+    });
+  };
 
   return (
     <div className="">
       <div className="flex justify-center mb-5">
         <div className="w-11/12 h-[80px] bg-orange-500 mt-[20px]  rounded  ">
           <p className="text-white mt-2 ml-3 text-[14px] md:text-[18px] font-light">
-          could you please fill the form?
+            could you please fill the form?
           </p>
         </div>
       </div>
 
-      
       <div class="flex justify-center">
-            {/* <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">First name</label> */}
-            <input  type="text" id="first_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block three p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 w-11/12" placeholder="Enter your name here" required />
-        </div>
-      
-
+        {/* <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">First name</label> */}
+        <input
+          onChange={(e) => {
+            setValue(e.target.value, e.target.name);
+          }}
+          type="text"
+          name="name"
+          id="first_name"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block three p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 w-11/12"
+          placeholder="Enter your name here"
+          required
+        />
+      </div>
 
       <div className="flex justify-center">
         <div className="w-11/12 h-[80px] md:h-[90px] lg:h-[100px] bg-white-400 mt-9   border-1 border-grey-50 rounded">
           <textarea
-            id="message"
+            onChange={(e) => {
+              setValue(e.target.value, e.target.name);
+            }}
+            id="purpose_note"
+            value={formValue.purpose_note}
             rows="4"
             class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Purpose of visit..."

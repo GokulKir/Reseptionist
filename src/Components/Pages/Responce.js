@@ -34,7 +34,8 @@ import {
   wishingPage,
   visitPurpose,
 } from "../../constant/TextConstatnt";
-import axios from '../../utils/axios'
+// import axios from "../../utils/axios";
+import { SingleUserByName } from "../../api/apiCalls";
 const Logo = require("../../assets/Robo.png");
 const Robo = require("../../assets/Logo.png");
 
@@ -53,7 +54,7 @@ function Responce() {
   const [giventime, setgivenTime] = useState();
   const [listUsers, setListUsers] = useRecoilState(ListUsers);
   const [purposeOfVisit, setPorposeOfVisit] = useRecoilState(PorposeOfVisit);
- const purposeOfVisitValue = useRecoilValue(PorposeOfVisit)
+  const purposeOfVisitValue = useRecoilValue(PorposeOfVisit);
 
   const [ta, setTa] = useState("meet a");
   const navigate = useNavigate();
@@ -65,7 +66,12 @@ function Responce() {
   const socket = useSocket();
   const [meetAlert, setMeetAlert] = useState(true);
   const [oneTimeAlert, setOneTimeAlert] = useState(true);
-
+  const [EmSelection, setEmselection] = useState(false);
+  const [nameTranscribe, setNameTranscribe] = useState("");
+  const [userData, setUserData] = useState([]);
+  const [userdisplayName, setUserdisplayName] = useState("");
+  const [userNameConfirmation, setUserNameConfirmation] = useState(false);
+  const [nameConformation, setNameConformation] = useState(false);
   useEffect(() => {
     const currentTime = moment().format("YYYY-MM-DD HH:mm:ss");
 
@@ -253,6 +259,9 @@ function Responce() {
   const startListening = async () => {
     await SpeechRecognition.startListening();
     setTalk(transcript);
+    if (transcript.length > 0) {
+      setNameTranscribe(transcript);
+    }
 
     if (meetAlert && transcript.length > 0 && oneTimeAlert) {
       console.log(transcript, "🫥");
@@ -264,13 +273,73 @@ function Responce() {
   };
 
   useEffect(() => {
+    if (EmSelection && !userNameConfirmation) {
+      const confirmed = new SpeechSynthesisUtterance(condition);
+      window.speechSynthesis.speak(confirmed);
+    }
+  }, [EmSelection]);
+
+  useEffect(() => {
+    if (userNameConfirmation) {
+      const confirmed = new SpeechSynthesisUtterance(
+        `Do you want to meet with ${userdisplayName}`
+      );
+      window.speechSynthesis.speak(confirmed);
+    }
+  }, [userNameConfirmation]);
+
+  useEffect(() => {
+    if (EmSelection) {
+      setTimeout(() => {
+        SingleUserByName(nameTranscribe).then((getUserData) => {
+          if (getUserData) {
+            setUserData(getUserData);
+          }
+        });
+      }, 4000);
+
+      setTimeout(() => {
+        if (nameConformation) {
+          navigate("/NotRes");
+        }
+      }, 20000);
+    }
+  }, [nameTranscribe]);
+
+  useEffect(() => {
+    if (userData.length > 0) {
+      setUserdisplayName(userData[0]?.display_name);
+    }
+  }, [userData]);
+  useEffect(() => {
+    if (userdisplayName) {
+      setEmselection(false);
+      setUserNameConfirmation(true);
+    }
+  }, [userdisplayName]);
+
+  useEffect(() => {
+    if (userNameConfirmation) {
+      if (nameTranscribe.toLowerCase().includes("yes")) {
+        navigate("/contactform");
+        setNameConformation(true);
+      }
+      if (nameTranscribe.toLowerCase().includes === "No") {
+        navigate("/NotRes");
+      }
+      // setUserNameConfirmation(false)
+    }
+  }, [userNameConfirmation, nameTranscribe]);
+
+  useEffect(() => {
     if (!oneTimeAlert) {
-      MeetAlert();
+      setEmselection(true);
     }
   }, [oneTimeAlert]);
 
   useEffect(() => {
     const text = "meet";
+    let oneTimeAlertData = true;
 
     if (
       transcript === text ||
@@ -282,7 +351,15 @@ function Responce() {
       const confirmed = new SpeechSynthesisUtterance(condition);
       window.speechSynthesis.speak(confirmed);
       setcondition("");
-      MeetAlert();
+      // setEmselection(true);
+
+      // setTimeout(() => {
+      //   if(oneTimeAlertData){
+      //   const visitPurposeConfig = new SpeechSynthesisUtterance(visitPurpose);
+      //   window.speechSynthesis.speak(visitPurposeConfig);
+      //   }
+      //   oneTimeAlertData = false;
+      // }, 1000);
       // AlertBox()
     }
   }, []);
@@ -330,7 +407,6 @@ function Responce() {
   useEffect(() => {
     const speakText = () => {
       // setSp(visitPurpose);
-      console.log("This is voice 🤢😈🤐" + AllVoice);
       const speech = new Speech();
       speech
         .init({
@@ -343,7 +419,7 @@ function Responce() {
           splitSentences: false,
           listeners: {
             onvoiceschanged: (voices) => {
-              console.log("Voices changed", voices);
+              // console.log("Voices changed", voices);
             },
           },
         })
@@ -353,13 +429,6 @@ function Responce() {
         .catch((e) => {
           console.error("Failed to speak text:", e);
         });
-      // const mettingPurposeSpeach = new SpeechSynthesisUtterance(Timesp,()=>{
-      //   console.log('====================================');
-      //   console.log('INITIAL LOG******');
-
-      //   console.log('====================================');
-      // });
-      // window.speechSynthesis.speak(mettingPurposeSpeach);
       setOnetimeSpeak(false);
     };
     if (OnetimeSpeak) {
@@ -380,7 +449,7 @@ function Responce() {
   useEffect(() => {
     if (Talk === "please shedule meet") {
       console.log("Give answer to meet");
-      MeetAlert();
+      // setEmselection(true);
     }
   }, []);
 
@@ -389,6 +458,70 @@ function Responce() {
     AlertBox();
   };
 
+  const PersonName = ({ condition, nameTranscribe, userNameConfirmation }) => {
+    return (
+      <div class="backdrop-blursm bg-black  inset-0 backdrop-blur-sm bg-opacity-25 fixed justify-center items-center flex ">
+        <div className="flex justify-center  w-[550px] h-[390px] bg-white rounded shadow ">
+          <div className="mt-[40px]">
+            <div className="flex justify-center">
+              <Icon
+                className="w-[60px] h-[60px] "
+                color="FB8C00"
+                icon="fluent:person-32-filled"
+              />
+            </div>
+
+            <div className="mt-[30px] mx-[20px]">
+              <p className="text-[16px] text-black  font-bold">{condition}</p>
+
+              <p className="text-[16px] text-black">{nameTranscribe}</p>
+            </div>
+
+            {!userNameConfirmation && (
+              <div className="flex justify-center mt-[30px]">
+                <Button
+                  onClick={() => setEmselection(false)}
+                  text="Cancel"
+                  className="w-[120px] h-[41px] flex  border-2   border-orange-600 content-center justify-center "
+                >
+                  <p className="text-stone-950 mt-[-9px]">Cancel</p>
+                </Button>
+              </div>
+            )}
+            {userNameConfirmation && (
+              <div className="flex justify-center mt-[30px]">
+                <Button
+                  onClick={() => setEmselection(false)}
+                  text="Cancel"
+                  className="w-[120px] h-[41px] flex  border-2   border-orange-600 content-center justify-center "
+                >
+                  <p className="text-stone-950 mt-[-9px]">Yes</p>
+                </Button>
+                <Button
+                  onClick={() => navigate("/NotRes")}
+                  text="Cancel"
+                  className="w-[120px] h-[41px] flex  border-2   border-orange-600 content-center justify-center "
+                >
+                  <p className="text-stone-950 mt-[-9px]">NO</p>
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div></div>
+
+          {/* 
+      <div className="mt-[20px] ">
+
+<p>Which employee would you prefered to?</p>
+
+
+
+</div> */}
+        </div>
+      </div>
+    );
+  };
   return (
     <div>
       <div className="bg-white-500 w-full h-[80px]">
@@ -418,13 +551,14 @@ function Responce() {
           >
             {sp}
           </MovingText>
+          <p>{Talk}</p>
         </div>
       </div>
       <div className="w-full h-[80px] bg-white-700 mt-[20px] md:mt-[60px] lg:mt-[120px] flex-row left-5 right-5 ">
         <div className=" flex  space-x-4 md:space-x-12  lg:space-x-10] ">
           <div className="w-[1px] md:w-2 lg:w-5 lg:table-fixed flex   "></div>
           <Button
-            onClick={() => MeetAlert()}
+            onClick={() => setEmselection(true)}
             className="w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] bg-orange-600  content-center "
           >
             <h1 className="text-[8px]  md:text-[17px] ">To meet a person</h1>
@@ -439,6 +573,16 @@ function Responce() {
           </p>
         </Link>
       </div>
+      {EmSelection === true ? (
+        <PersonName condition={condition} nameTranscribe={nameTranscribe} />
+      ) : null}
+      {userNameConfirmation && (
+        <PersonName
+          condition={`Do you want to meet with ${userdisplayName}`}
+          nameTranscribe={nameTranscribe}
+          userNameConfirmation
+        />
+      )}
     </div>
   );
 }
