@@ -53,7 +53,7 @@ function Talk() {
 
   useEffect(() => {
     socket.on("message", (data) => {
-      //   console.log(data, "Socket data");
+        // console.log(data, "Socket data");
       const jsonData = JSON.parse(data);
       //   console.log("JSON data", jsonData);
       const { user } = jsonData;
@@ -66,6 +66,12 @@ function Talk() {
 
       setDisplatName(user.display_name);
     });
+
+    socket.on("userIdDetails",(data)=>{
+      console.log('===============😵‍💫=====================');
+      console.log(data);
+      console.log('====================================');
+    })
 
   
   }, []);
@@ -80,6 +86,10 @@ function Talk() {
     console.log("====================================");
 
     try {
+      const responce = new SpeechSynthesisUtterance("Hello" + DisplatName);
+      if (!(DisplatName === "Unknown")) {
+        window.speechSynthesis.speak(responce);
+      }
       //   let responce = new SpeechSynthesisUtterance("Hello" + DisplatName);
       const textToSpeach = (data) => {
         const speech = new Speech();
@@ -129,7 +139,7 @@ function Talk() {
 
         if (DisplatName === "Unknown") {
           // window.speechSynthesis.speak(responce);
-          navigate("/responce");
+          navigate("/Responce");
         } else {
           if (DisplatName) {
             textToSpeach("Hello" + DisplatName);

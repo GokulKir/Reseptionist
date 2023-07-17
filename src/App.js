@@ -19,8 +19,13 @@ import { SocketProvider } from "./Context/SocketContext";
 // const URL = process.env.PORT === 'production' ? undefined : 'http://localhost:5000';
 
 // const SocketURL = 'https://hubo3.domainenroll.com'
+// <<<<<<< newBugBranch
+// // const SocketURL = "http://localhost:3000";
+// const SocketURL = "https://hubo4.domainenroll.com/";
+// =======
 const SocketURL = "https://hubo4.domainenroll.com";
 // const SocketURL = "https://hubo4.domainenroll.com/";
+
 
 
 export default function App() {
@@ -30,7 +35,7 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Talk />}></Route>
-            <Route path="responce" element={<Responce />}></Route>
+            <Route path="Responce" element={<Responce />}></Route>
             <Route path="NotRes" element={<NotRes />}></Route>
             <Route path="contactform" element={<ContactForm />}></Route>
             <Route path="Conditions" element={<Conditions />}></Route>
