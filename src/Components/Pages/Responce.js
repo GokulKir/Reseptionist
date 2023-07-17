@@ -5,7 +5,7 @@ import { TextTransition, presets } from "react-text-transition";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
-import Speech from "speak-tts";
+// import Speech from "speak-tts";
 import "./Res.css";
 import { Alert } from "react-bootstrap";
 import {
@@ -28,7 +28,6 @@ import Swal from "sweetalert2";
 import { useSocket } from "../../Context/SocketContext";
 import moment from "moment";
 import Say from 'react-say';
-
 
 
 const Logo = require("../../assets/Robo.png");
@@ -55,7 +54,17 @@ function Responce() {
   const id = useId();
   const [data, setData] = useState();
   const socket = useSocket();
-  const speech = new Speech();
+ 
+  // const speech = new Speech();
+  const Hey = 'Hello, world!'; // Replace with the text you want to speak
+
+
+
+
+
+
+
+
 
 
   const PersonName = () => {
@@ -94,29 +103,9 @@ function Responce() {
       <div>
 
       </div>
-
-
-
-
-
-
-
-
-
-
-
-
-      
-
-{/* 
-      <div className="mt-[20px] ">
-
+{/*       <div className="mt-[20px] ">
 <p>Which employee would you prefered to?</p>
-
-
-
 </div> */}
-
 
      </div>
 
@@ -169,9 +158,6 @@ function Responce() {
   </div>
 
 </div>
-
-
-
 <div>
 </div>
 </div>
@@ -267,9 +253,8 @@ setTimeout(() => {
   }, [data])
 
    //API Calling single user//
+ 
 
-
-  
 
 
   useEffect(() => {}, []);
@@ -316,6 +301,7 @@ setTimeout(() => {
       
     // }, 9000);
   };
+
 
 
 
@@ -403,7 +389,7 @@ setTimeout(() => {
 
 
 
-  
+
   const startListening = async () => {
     await SpeechRecognition.startListening();
     console.log(transcript);
@@ -450,27 +436,7 @@ setTimeout(() => {
 
 
   
-  useEffect(() => {
-    const speech = new Speech();
-    const Timesp = "Hello, how are you?";
-
-    const speakText = () => {
-      setTimeout(() => {
-        speech.speak({
-          text: Timesp
-        });
-      }, 5000);
-    };
-
-    speech.init().then(() => {
-      speakText();
-    });
-
-    return () => {
-      speech.cancel();
-    };
-  }, []);
-
+  
 
 
 

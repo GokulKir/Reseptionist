@@ -10,13 +10,12 @@ import { useNavigate } from 'react-router-dom';
 function Conditions() {
   const [Popup , setPopup] = useState(false)
   const [Clicked , setClicked] = useState(false)
-
+  
   const navigate = useNavigate()
     
   const Allow = () => {
 
      navigate('/contactform')
-  
 
   }
 
