@@ -10,25 +10,33 @@ import { useSocket } from "../../Context/SocketContext";
 import moment from "moment";
 import { noteResponce, FullData } from "../../constant/constant";
 import Speech from "speak-tts";
-import {PorposeOfVisit} from '../../Recoil/recoil'
+import { PorposeOfVisit,EmployeeData } from "../../Recoil/recoil";
 import { useRecoilState, useRecoilValue } from "recoil";
+import {
+  listAllDipartment,
+  listAllUserUnderDipartment,
+} from "../../api/apiCalls";
 function NotRes() {
   const navigate = useNavigate();
   const [Option, setOpation] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [useropen, setUserOpen] = React.useState(false);
-
+  const [allDipartment, setAllDipartment] = useState(null);
+  const [selectedDipartment, setSelectedDipartment] = useState(null);
+  const [listAllEmployee, setListAllEmployee] = useState(null);
   // const [purposeOfVisit,setPorposeOfVisit] = useRecoilValue(PorposeOfVisit);
 
- const purposeOfVisit = useRecoilValue(PorposeOfVisit)
+  const purposeOfVisit = useRecoilValue(PorposeOfVisit);
+  const[EmployeeDataList,setEmployeeDataList] = useRecoilState(EmployeeData)
   const [data, setData] = useState("Department");
   const [userData, setUserData] = useState("");
-  const [Navigate, setNavigate] = useState(false)
-  const[error,setError] = useState(null)
+  const [Navigate, setNavigate] = useState(false);
+  const [error, setError] = useState(null);
   const [Spe, setSpe] = useState(
     "I am sorry , but couldn't catch you . Could you please select the concerned from the drop down list on the Tab next to me"
   );
   const [formValue, setformValue] = useState(noteResponce);
+
   const [userLIST, setUserList] = useState(FullData);
 
   const socket = useSocket();
@@ -36,6 +44,7 @@ function NotRes() {
   useEffect(() => {
     console.log(data);
   }, [data]);
+
 
   useEffect(() => {
     console.log(userData, "userData");
@@ -69,6 +78,13 @@ function NotRes() {
   }, [useropen]);
 
   useEffect(() => {
+    const getDiparment = async () => {
+      let apiResponse = await listAllDipartment();
+      if (apiResponse) {
+        setAllDipartment(apiResponse);
+      }
+    };
+    getDiparment();
     const handleApiResponse = (data) => {
       console.log("API Response:", data);
       // Handle the API response here
@@ -107,30 +123,27 @@ function NotRes() {
     //   formValue.purpose_note
     // );
     // {empoyee_name: null, job_title: null, purpose_note: null}
-   
 
     if (
       formValue.empoyee_name ||
       formValue.job_title ||
       formValue.purpose_note
     ) {
-      setError(false)
-      setNavigate(true)
+      setError(false);
+      setNavigate(true);
       return;
-
     }
-    setError(true)
+    setError(true);
     return;
-
   };
 
   useEffect(() => {
-    if(Navigate){
-    navigate("/Conditions");
+    if (Navigate) {
+      navigate("/contactform");
+      setEmployeeDataList(formValue)
     }
-    
-  }, [Navigate])
-  
+
+  }, [Navigate]);
 
   useEffect(() => {
     if (
@@ -143,9 +156,21 @@ function NotRes() {
       setSpe("");
     }
     setformValue({
-      purpose_note:purposeOfVisit
-    })
+      purpose_note: purposeOfVisit,
+    });
   }, []);
+
+  useEffect(() => {
+    const getEmployeeUnderDipartment = async () => {
+      const GetAllUserUnderDipartment = await listAllUserUnderDipartment(
+        selectedDipartment
+      );
+      if (GetAllUserUnderDipartment) {
+        setListAllEmployee(GetAllUserUnderDipartment);
+      }
+    };
+    getEmployeeUnderDipartment();
+  }, [selectedDipartment]);
 
   const setValue = (data, name) => {
     setformValue({
@@ -154,10 +179,8 @@ function NotRes() {
     });
   };
 
-  
   useEffect(() => {
     console.log(formValue);
-
   }, [formValue]);
 
   return (
@@ -193,18 +216,17 @@ function NotRes() {
           onChange={(e) => {
             console.log(e.target.value, e.target.name, "ggg");
             setValue(e.target.value, e.target.name);
+            setSelectedDipartment(e.target.value);
           }}
           name="job_title"
           className=" w-11/12 h-[80px] md:h-[90px] lg:h-[100px] bg-white-400 mt-9 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-600 focus:border-orange-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-600 dark:focus:border-orange-600"
         >
-          {FullData.map(
-            (obj, i) =>
-              obj.job_title && (
-                <option value={obj.job_title} key={i}>
-                  {obj.job_title}
-                </option>
-              )
-          )}
+          <option value="">Select Department</option>
+          {allDipartment?.map((obj, i) => (
+            <option value={obj} key={i}>
+              {obj}
+            </option>
+          ))}
         </select>
 
         {/* </div> */}
@@ -217,8 +239,9 @@ function NotRes() {
             onChange={(e) => setValue(e.target.value, e.target.name)}
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-600 focus:border-orange-600 block w-full h-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-600 dark:focus:border-orange-600"
           >
-            {FullData.map((obj, i) => (
-              <option value={obj.display_name} key={i}>
+            <option value="">Select Employee</option>
+            {listAllEmployee?.map((obj, i) => (
+              <option value={obj.member_id} key={obj.member_id}>
                 {obj.display_name}
               </option>
             ))}
@@ -267,15 +290,12 @@ function NotRes() {
           ></textarea>
         </div>
       </div>
-    {  console.log(error)}
 
-
-  
-
-   {error&& <div className="flex justify-center">
-
-        <p className="text-red-500">Fill the above fields</p>
-      </div>}
+      {error && (
+        <div className="flex justify-center">
+          <p className="text-red-500">Fill the above fields</p>
+        </div>
+      )}
 
       <div className="flex justify-center">
         <div className="w-10/12 h-[120px] mt-[80px] flex justify-center pt-[40px]">

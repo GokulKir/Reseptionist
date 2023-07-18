@@ -38,3 +38,13 @@ export const PorposeOfVisit = atom({
   key : "listUsers",
   default : ""
 })
+
+export const gustId = atom({
+  key : "gustId",
+  default : ""
+})
+
+export const EmployeeData = atom({
+  key : "EmployeeData",
+  default : ""
+})

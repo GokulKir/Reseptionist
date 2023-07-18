@@ -36,6 +36,10 @@ import {
 } from "../../constant/TextConstatnt";
 // import axios from "../../utils/axios";
 import { SingleUserByName } from "../../api/apiCalls";
+import { EmployeeData } from "../../Recoil/recoil";
+import { useSnackbar } from 'react-simple-snackbar'
+
+
 const Logo = require("../../assets/Robo.png");
 const Robo = require("../../assets/Logo.png");
 
@@ -48,13 +52,31 @@ function Responce() {
   const [Typed, setTyped] = useState();
   const [Qa, setQa] = useRecoilState(Question);
   const [condition, setcondition] = useState(preferedText);
-
+  const [employeeDetails, setEmployeeDetails] = useRecoilState(EmployeeData);
   const [selection, setSelection] = useState(0);
   const [givenName, setgivenName] = useState();
   const [giventime, setgivenTime] = useState();
   const [listUsers, setListUsers] = useRecoilState(ListUsers);
   const [purposeOfVisit, setPorposeOfVisit] = useRecoilState(PorposeOfVisit);
   const purposeOfVisitValue = useRecoilValue(PorposeOfVisit);
+
+
+  const options = {
+    position: 'top-center',
+    style: {
+      backgroundColor: '#fff',
+      border: '#FB8C00',
+      color: '#FB8C00',
+      fontFamily: 'Menlo, monospace',
+      fontSize: '20px',
+      textAlign: 'center',
+    },
+    closeStyle: {
+      color: 'lightcoral',
+      fontSize: '16px',
+    },
+  }
+
 
   const [ta, setTa] = useState("meet a");
   const navigate = useNavigate();
@@ -72,6 +94,14 @@ function Responce() {
   const [userdisplayName, setUserdisplayName] = useState("");
   const [userNameConfirmation, setUserNameConfirmation] = useState(false);
   const [nameConformation, setNameConformation] = useState(false);
+  const [openSnackbar, closeSnackbar] = useSnackbar(options)
+ const  [MeetPending , setMeetPending] = useState(false);
+
+
+
+
+  useSnackbar(options)
+
   useEffect(() => {
     const currentTime = moment().format("YYYY-MM-DD HH:mm:ss");
 
@@ -293,22 +323,25 @@ function Responce() {
       setTimeout(() => {
         SingleUserByName(nameTranscribe).then((getUserData) => {
           if (getUserData) {
+
             setUserData(getUserData);
+            
           }
         });
       }, 4000);
 
-     let nameNotRecognized = setTimeout(() => {
+      let nameNotRecognized = setTimeout(() => {
         if (!nameConformation) {
-          navigate("/NotRes");
+        
+          openSnackbar("Name is not recognized")
+          setMeetPending(true)
         }
       }, 20000);
       if (nameConformation) {
         clearTimeout(nameNotRecognized);
       }
-
     }
-  }, [nameTranscribe,nameConformation]);
+  }, [nameTranscribe, nameConformation]);
 
   useEffect(() => {
     if (userData.length > 0) {
@@ -322,18 +355,40 @@ function Responce() {
     }
   }, [userdisplayName]);
 
-  useEffect(() => {
-    if (userNameConfirmation) {
+  const ResponceFunction = () => {
+
+ 
       if (nameTranscribe.toLowerCase().includes("yes")) {
         navigate("/contactform");
         setNameConformation(true);
+        setEmployeeDetails(userData);
       }
       if (nameTranscribe.toLowerCase().includes === "No") {
         navigate("/NotRes");
       }
       // setUserNameConfirmation(false)
+    
+
+  }
+
+  useEffect(() => {
+    // if (userNameConfirmation) {
+    //   if (nameTranscribe.toLowerCase().includes("yes")) {
+    //     navigate("/contactform");
+    //     setNameConformation(true);
+    //     setEmployeeDetails(userData);
+    //   }
+    //   if (nameTranscribe.toLowerCase().includes === "No") {
+    //     navigate("/NotRes");
+    //   }
+    //   // setUserNameConfirmation(false)
+    // }
+    if (userNameConfirmation) {
+
+    ResponceFunction()
     }
   }, [userNameConfirmation, nameTranscribe]);
+
 
   useEffect(() => {
     if (!oneTimeAlert) {
@@ -408,6 +463,65 @@ function Responce() {
   //   }
   // }, []);
 
+
+  const NavigateMeet = () => {
+    navigate('/NotRes')
+    setMeetPending(false)
+  }
+
+
+  const MeetPendingComponent = () => {
+    return (
+      <div class="backdrop-blursm bg-black  inset-0 backdrop-blur-sm bg-opacity-25 fixed justify-center items-center flex ">
+        <div className="flex justify-center  w-[450px] h-[330px] bg-white rounded shadow ">
+
+     
+        
+
+        
+
+          <div className="mt-[30px]">
+            <div className="flex justify-center">
+              <Icon
+                className="w-[60px] h-[60px] "
+                color="FB8C00"
+                icon="uiw:warning" 
+              />
+            </div>
+
+            <div className="mt-[50px] mx-[20px]">
+              <p className="text-[18px] text-black  font-bold">Name is not recognized</p>
+
+            
+            </div>
+      <div className="flex justify-center mt-[48px]">
+
+            <Button onClick={()=> NavigateMeet()}
+                
+                  text="Cancel"
+                  className="w-[120px] h-[41px] flex  border-2   border-orange-600 content-center justify-center "
+                >
+                  <p className="text-stone-950 mt-[-9px]">OK</p>
+                </Button>
+
+            </div>
+
+            </div>
+
+
+         
+
+
+          
+        </div>
+
+      </div>
+    )
+  }
+
+
+
+
   useEffect(() => {
     const speakText = () => {
       // setSp(visitPurpose);
@@ -446,7 +560,7 @@ function Responce() {
     if (visitPurpose) {
       startListening();
     }
-  }, []);
+  }, []); 
 
   /*/ Meet sheduling/*/
 
@@ -475,11 +589,15 @@ function Responce() {
               />
             </div>
 
+       
+
             <div className="mt-[30px] mx-[20px]">
               <p className="text-[16px] text-black  font-bold">{condition}</p>
 
               <p className="text-[16px] text-black">{nameTranscribe}</p>
             </div>
+
+            
 
             {!userNameConfirmation && (
               <div className="flex justify-center mt-[30px]">
@@ -555,6 +673,12 @@ function Responce() {
           >
             {sp}
           </MovingText>
+
+          
+
+
+    
+       
           <p>{Talk}</p>
         </div>
       </div>
@@ -577,6 +701,7 @@ function Responce() {
           </p>
         </Link>
       </div>
+      
       {EmSelection === true ? (
         <PersonName condition={condition} nameTranscribe={nameTranscribe} />
       ) : null}
@@ -587,6 +712,7 @@ function Responce() {
           userNameConfirmation
         />
       )}
+      {MeetPending == true ? <MeetPendingComponent/> : null}
     </div>
   );
 }
