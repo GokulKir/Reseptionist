@@ -67,12 +67,6 @@ function Talk() {
       setDisplatName(user.display_name);
     });
 
-    socket.on("userIdDetails",(data)=>{
-      console.log('===============😵‍💫=====================');
-      console.log(data);
-      console.log('====================================');
-    })
-
   
   }, []);
 
@@ -265,7 +259,7 @@ function Talk() {
 
         <div>
           <h1 className="text-[30px]  md:text-[60px] lg:text-[70px] mt-[24px] font-light	">
-            i'm
+            I'm
           </h1>
         </div>
 

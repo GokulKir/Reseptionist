@@ -11,6 +11,9 @@ import moment from "moment";
 import { PorposeOfVisit } from "../../Recoil/recoil";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { noteResponce } from "../../constant/constant";
+import {updateMeetingPurpose} from '../../api/apiCalls'
+import {EmployeeData,gustId} from '../../Recoil/recoil';
+
 
 import Speech from "speak-tts";
 
@@ -233,12 +236,21 @@ const FullData = [
   },
 ];
 
+let MockuserData = {
+  employee_id:"dfb5b491-26bc-40cc-8618-1ed805aa6cd1",
+  guest_id:"IQMImZJKibmtXzEm",
+  purpose_of_visit:"kghjgjkgjkhkhkjgjgjgjhgj",
+    guest_name:"simran" 
+}
+
 function ContactForm() {
   const navigate = useNavigate();
   const [Option, setOpation] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [useropen, setUserOpen] = React.useState(false);
   const purposeOfVisit = useRecoilValue(PorposeOfVisit);
+  const employeeDetails = useRecoilValue(EmployeeData);
+  const getGustId = useRecoilValue(gustId);
   const [formValue, setformValue] = useState(noteResponce);
   const [data, setData] = useState("Department");
   const [userData, setUserData] = useState("");
@@ -306,16 +318,17 @@ function ContactForm() {
       console.log("API Response:", data);
       // Handle the API response here
     };
-
     socket.on("apiResponse", handleApiResponse);
+
+    
 
     // Return a cleanup function to remove the event listener
     return () => {
       socket.off("apiResponse", handleApiResponse);
-    };
+    };  
   }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     console.log("Submit button clicked");
     const currentTime = moment().format("YYYY-MM-DD HH:mm:ss");
     const mockData = {
@@ -331,17 +344,30 @@ function ContactForm() {
       // Clean up the event listener after receiving the response
       socket.off("apiResponse", handleApiResponse);
     };
-
+    const gustID = localStorage.getItem('gustID')
     socket.on("apiResponse", handleApiResponse);
+
+    const ApiData = {
+      ...MockuserData,
+      employee_id:employeeDetails.empoyee_name,
+      purpose_of_visit :purposeOfVisit?purposeOfVisit:employeeDetails?.purpose_note,
+      guest_name:formValue.name,
+      guest_id:gustID
+    }
+console.log('===================gustID..=================');
+console.log(getGustId);
+console.log('====================================');
+const apiResponse = await updateMeetingPurpose(ApiData);  
 
     navigate("/Conditions");
   };
+
+  
 
   useEffect(() => {
     if (Spe === "could you please fill the form?") {
       const confirmed = new SpeechSynthesisUtterance(Spe);
       window.speechSynthesis.speak(confirmed);
-
       setSpe("");
     }
     setformValue({
@@ -387,7 +413,8 @@ function ContactForm() {
               setValue(e.target.value, e.target.name);
             }}
             id="purpose_note"
-            value={formValue.purpose_note}
+            value={formValue.purpose_note?employeeDetails?.purpose_note:employeeDetails?.purpose_note}
+            name="purpose_note"
             rows="4"
             class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Purpose of visit..."
