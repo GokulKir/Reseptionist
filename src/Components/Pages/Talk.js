@@ -11,12 +11,13 @@ import SpeechRecognition, {
 } from "react-speech-recognition";
 import Speech from "speak-tts";
 import { TextTransition, presets } from "react-text-transition";
-import { useRecoilState } from "recoil";
-import { ListUsers, VoiceAssist } from "../../Recoil/recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { gustId, ListUsers, VoiceAssist, VoicePass } from "../../Recoil/recoil";
 import mqtt, { log } from "mqtt/dist/mqtt";
 import { useSocket } from "../../Context/SocketContext";
 import { wishingPage } from "../../constant/TextConstatnt";
 import { Icon } from "@iconify/react";
+
 
 const Logo = require("../../assets/Robo.png");
 const Robo = require("../../assets/Logo.png");
@@ -30,8 +31,12 @@ function Talk() {
   const speech = new Speech();
   const socket = useSocket();
   const [DisplatName, setDisplatName] = useState(null);
+  const [PassVoice , setPassVoice] = useRecoilState(VoicePass)
+  const GusterId = useRecoilValue(gustId)
+  const res = new SpeechSynthesisUtterance("hello there how can i help you today What is the purpose of visit?");
 
-  // useEffect(() => {
+
+  // useEffect(() => {iii
   // socket.on('message',(data)=>{
   //  console.log(data,"socket data");
   //   const jsonData = JSON.parse(data);
@@ -43,45 +48,158 @@ function Talk() {
   //     });
 
   // }, [])
+  useEffect(()=>{
+
+    console.log("+++++"+GusterId);
+
+  },[])
+  const displayNameTrigger = (DisplayUserName) => {
+    if (DisplayUserName === "Unknown") {
+      console.log("Unknown Display" + DisplayUserName);
+    }
+  
+    console.log("====================================");
+    console.log(DisplayUserName);
+    console.log("====================================");
+  
+    try {
+      // const responce = new SpeechSynthesisUtterance('');
+  
+      if (DisplayUserName !== null) {
+        const responce = new SpeechSynthesisUtterance("Hello " + DisplayUserName);
+  
+        if (!(DisplayUserName === "Unknown")) {
+          window.speechSynthesis.speak(responce);
+        }
+  
+        if (DisplayUserName === "Unknown") {
+          const textToSpeach = (data) => {
+            const speech = new Speech();
+  
+            console.log("====================================");
+            console.log("im in with", data);
+            console.log("====================================");
+            const speakAfterDelay = () => {
+              setTimeout(() => {
+                speech.speak({
+                  text: data,
+                });
+              }, 5000);
+            };
+  
+            speech.init().then(() => {
+              speakAfterDelay();
+            });
+  
+            // Cleanup function
+            return () => {
+              speech.cancel();
+            };
+          };
+  
+          if (DisplayUserName === "Unknown") {
+            console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+            navigate("/Responce");
+            textToSpeach("Hello there, how can I help you today? What is the purpose of your visit?");
+          } else {
+            if (DisplayUserName) {
+              textToSpeach("Hello " + DisplayUserName);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  
+  
+
+  // useEffect(() => {
+  //   socket.on("message", (data) => {
+  //       // console.log(data, "Socket data");
+  //     const jsonData = JSON.parse(data);
+  //     //   console.log("JSON data", jsonData);
+  //     const { user } = jsonData;
+  //     console.log("User******", user);
+  //     if (user.user == "Unknown") {
+  //       // setDisplatName("Unknown");
+  //       displayNameTrigger("Unknown")
+  //       return;
+  //     }
+  //     console.log("User******", user.display_name);
+
+  //     // setDisplatName(user.display_name);
+  //     displayNameTrigger(user.display_name)
+  //   });
+  // }, []);
 
   useEffect(() => {
-    socket.on("message", (data) => {
-        // console.log(data, "Socket data");
+    console.log("Setting up socket event listener...");
+  
+    const handleSocketMessage = (data) => {
+      console.log("Received message from server:", data);
       const jsonData = JSON.parse(data);
-      //   console.log("JSON data", jsonData);
       const { user } = jsonData;
       console.log("User******", user);
-      if (user.user == "Unknown") {
-        setDisplatName("Unknown");
-        return;
-      }
-      console.log("User******", user.display_name);
-
-      setDisplatName(user.display_name);
-    });
-
   
+      if (user.user === "Unknown") {
+        displayNameTrigger("Unknown");
+      } else {
+        displayNameTrigger(user.display_name);
+      }
+    };
+  
+    socket.on("message", handleSocketMessage);
+  
+    // Cleanup function to unsubscribe the event listener when the component is unmounted
+    return () => {
+      console.log("Cleaning up socket event listener...");
+      socket.off("message", handleSocketMessage);
+    };
   }, []);
+  
+  
+
+
 
   useEffect(() => {
+
+
+
+    console.log("Database******",DisplatName);
+  
+
+    if(DisplatName === "Unknown"){
+      console.log("Unknown Display"+DisplatName);
+    }
+
+
+    
     console.log("====================================");
     console.log(DisplatName);
     console.log("====================================");
 
     try {
-      const responce = new SpeechSynthesisUtterance("Hello" + DisplatName);
+
+      // const responce = new SpeechSynthesisUtterance('');
+
+      if(DisplatName !== null){
+        const responce = new SpeechSynthesisUtterance("Hello" + DisplatName);
+
+      
       if (!(DisplatName === "Unknown")) {
         window.speechSynthesis.speak(responce);
       }
 
       if (DisplatName === "Unknown") {
-        navigate("/Responce");
+      
         //   let responce = new SpeechSynthesisUtterance("Hello" + DisplatName);
         const textToSpeach = (data) => {
           const speech = new Speech();
 
           console.log("====================================");
-          console.log("im in with 😮", data);
+          console.log("im in with", data);
           console.log("====================================");
           const speakAfterDelay = () => {
             setTimeout(() => {
@@ -100,16 +218,27 @@ function Talk() {
             speech.cancel();
           };
         };
+      
 
         if (DisplatName === "Unknown") {
+          console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
           // window.speechSynthesis.speak(responce);
           navigate("/Responce");
+
+          // window.speechSynthesis.speak(res);
+          textToSpeach("hello there how can i help you today What is the purpose of visit?")
         } else {
-          if (DisplatName) {
-            textToSpeach("Hello" + DisplatName);
-          }
+       
+
+            if (DisplatName) {
+              textToSpeach("Hello" + DisplatName);
+            }
+
+          
+        
           // window.speechSynthesis.speak(responce);
         }
+      }
         //   new SpeechSynthesisUtterance("");
 
         //   setDisplatName(null);
@@ -117,7 +246,10 @@ function Talk() {
     } catch (error) {
       console.log(error.message);
     }
+ 
   }, [DisplatName]);
+
+
 
   // const Logo = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.4&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1ym1';
   // const User = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.3&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1yt3';
@@ -151,7 +283,13 @@ function Talk() {
 
   const startRecord = async () => {
     await SpeechRecognition.startListening();
+
     console.log(transcript);
+
+   if(transcript.length > 0) {
+     setPassVoice(true)
+   }
+
     setVoiceAssistant(transcript);
 
     const text = "Nora";
@@ -169,6 +307,7 @@ function Talk() {
       if (Talking) {
         window.speechSynthesis.speak(Talking);
       }
+      setPassVoice(true)
       setSp("");
       navigate("/responce");
     }

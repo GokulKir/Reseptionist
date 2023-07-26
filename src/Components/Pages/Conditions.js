@@ -11,14 +11,12 @@ import {
 import { useSocket } from "../../Context/SocketContext";
 import Swal from "sweetalert2";
 import { useRecoilValue } from "recoil";
-import { gustId } from "../../Recoil/recoil";
 function Conditions() {
   const [Popup, setPopup] = useState(false);
   const [Clicked, setClicked] = useState(false);
   const [Confirmation, setConfirmation] = useState(null);
   const navigate = useNavigate();
   const socket = useSocket();
-  const gustId = useRecoilValue(gustId)
 
   const CameraPermission = () => {
     return (
@@ -79,6 +77,8 @@ function Conditions() {
 
   // },[])
 
+    
+   
   useEffect(() => {
     // setTimeout(() => {
     // navigate('/contactform')
@@ -88,7 +88,6 @@ function Conditions() {
       if (data) {
         setInterval(() => {
           const gustData = localStorage.getItem("gustID");
-          console.log("This is id+++++"+gustId);
 
           if (gustData === "accepted") {
             console.log("===============😱🤫=====================");
@@ -105,9 +104,12 @@ function Conditions() {
 
     // const gustData = localStorage.getItem('gustID')
     // if(gustData=='accepted'){
-    //   setConfirmation(true)
+    //   setConfirmation(true)XX
     // }
   }, []);
+
+
+  
 
   useEffect(() => {
     console.log("====================================");
@@ -144,6 +146,10 @@ function Conditions() {
     }
   }, [Confirmation]);
 
+
+
+
+
   const PersonName = ({ condition, userNameConfirmation }) => {
     return (
       <div class="backdrop-blursm bg-black  inset-0 backdrop-blur-sm bg-opacity-25 fixed justify-center items-center flex ">
@@ -159,7 +165,6 @@ function Conditions() {
 
             <div className="mt-[30px] mx-[20px]">
               <p className="text-[16px] text-black  font-bold">{condition}</p>
-
               {/* <p className="text-[16px] text-black">{nameTranscribe}</p> */}
             </div>
 

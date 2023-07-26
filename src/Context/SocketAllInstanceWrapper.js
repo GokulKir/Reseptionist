@@ -9,6 +9,7 @@ function SocketAllInstanceWrapper({ children}) {
 
   useEffect(() => {
     socket.on('userIdDetails', (data) => {
+      console.log(data,"Data>>>>>>>>");
       if (data) {
         localStorage.setItem('gustID', data.data.value);
         // setfirst(data.data.value);

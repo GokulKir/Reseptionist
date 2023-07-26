@@ -25,22 +25,18 @@ function NotRes() {
   const [selectedDipartment, setSelectedDipartment] = useState(null);
   const [listAllEmployee, setListAllEmployee] = useState(null);
   // const [purposeOfVisit,setPorposeOfVisit] = useRecoilValue(PorposeOfVisit);
-
   const purposeOfVisit = useRecoilValue(PorposeOfVisit);
   const[EmployeeDataList,setEmployeeDataList] = useRecoilState(EmployeeData)
   const [data, setData] = useState("Department");
   const [userData, setUserData] = useState("");
   const [Navigate, setNavigate] = useState(false);
   const [error, setError] = useState(null);
-  const [Spe, setSpe] = useState(
-    "I am sorry , but couldn't catch you . Could you please select the concerned from the drop down list on the Tab next to me"
-  );
+  const [Spe, setSpe] = useState("I am sorry , but couldn't catch you . Could you please select the concerned from the drop down list on the Tab next to me");
   const [formValue, setformValue] = useState(noteResponce);
-
   const [userLIST, setUserList] = useState(FullData);
 
-  const socket = useSocket();
 
+  const socket = useSocket();
   useEffect(() => {
     console.log(data);
   }, [data]);
@@ -50,26 +46,31 @@ function NotRes() {
     console.log(userData, "userData");
   }, [userData]);
 
+
   useEffect(() => {
     console.log("User List", userLIST);
   }, [userLIST]);
+
 
   const handleOpen = () => {
     setOpen(!open);
   };
 
+
   const handleUserOpen = () => {
     setUserOpen(!useropen);
   };
 
+
+
   useEffect(() => {
     socket.emit("getAllUsers", { message: "Hello from the client" });
-
     socket.on("userList", (data) => {
       const userJson = JSON.parse(data);
       console.log("API Response:", userJson);
       setUserList(userJson);
     });
+
 
     // Return a cleanup function to remove the event listener
     return () => {
@@ -77,13 +78,15 @@ function NotRes() {
     };
   }, [useropen]);
 
+
   useEffect(() => {
     const getDiparment = async () => {
       let apiResponse = await listAllDipartment();
       if (apiResponse) {
         setAllDipartment(apiResponse);
-      }
+      } 
     };
+
     getDiparment();
     const handleApiResponse = (data) => {
       console.log("API Response:", data);
@@ -98,6 +101,9 @@ function NotRes() {
     };
   }, []);
 
+
+
+
   const handleSubmit = () => {
     console.log("Submit button clicked");
     const currentTime = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -105,6 +111,9 @@ function NotRes() {
       user_id: userData,
       date_time: currentTime,
     };
+
+    
+
 
     socket.emit("payload", mockData);
 
@@ -114,6 +123,8 @@ function NotRes() {
       // Clean up the event listener after receiving the response
       socket.off("apiResponse", handleApiResponse);
     };
+
+
 
     socket.on("apiResponse", handleApiResponse);
 
@@ -137,28 +148,30 @@ function NotRes() {
     return;
   };
 
+
   useEffect(() => {
     if (Navigate) {
       navigate("/contactform");
       setEmployeeDataList(formValue)
     }
-
   }, [Navigate]);
+
+
 
   useEffect(() => {
     if (
-      Spe ===
-      "I am sorry , but couldn't catch you . Could you please select the concerned from the drop down list on the Tab next to me"
+      Spe ===  "I am sorry , but couldn't catch you . Could you please select the concerned from the drop down list on the Tab next to me"
     ) {
       const confirmed = new SpeechSynthesisUtterance(Spe);
       window.speechSynthesis.speak(confirmed);
-
       setSpe("");
     }
     setformValue({
       purpose_note: purposeOfVisit,
     });
   }, []);
+
+
 
   useEffect(() => {
     const getEmployeeUnderDipartment = async () => {
@@ -172,6 +185,8 @@ function NotRes() {
     getEmployeeUnderDipartment();
   }, [selectedDipartment]);
 
+
+
   const setValue = (data, name) => {
     setformValue({
       ...formValue,
@@ -179,9 +194,13 @@ function NotRes() {
     });
   };
 
+
+
   useEffect(() => {
     console.log(formValue);
   }, [formValue]);
+
+
 
   return (
     <div className="">

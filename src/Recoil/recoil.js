@@ -48,3 +48,8 @@ export const EmployeeData = atom({
   key : "EmployeeData",
   default : ""
 })
+
+export const VoicePass = atom({
+  key : "VoicePass",
+  default : false
+})
