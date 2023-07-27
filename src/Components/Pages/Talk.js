@@ -12,7 +12,7 @@ import SpeechRecognition, {
 import Speech from "speak-tts";
 import { TextTransition, presets } from "react-text-transition";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { gustId, ListUsers, VoiceAssist, VoicePass } from "../../Recoil/recoil";
+import { gustId, ListUsers, UnknownVoice, VoiceAssist, VoicePass } from "../../Recoil/recoil";
 import mqtt, { log } from "mqtt/dist/mqtt";
 import { useSocket } from "../../Context/SocketContext";
 import { wishingPage } from "../../constant/TextConstatnt";
@@ -32,6 +32,9 @@ function Talk() {
   const socket = useSocket();
   const [DisplatName, setDisplatName] = useState(null);
   const [PassVoice , setPassVoice] = useRecoilState(VoicePass)
+  const [speechSpoken, setSpeechSpoken] = useState(false);
+  const [Unk , setUnk] = useRecoilState(UnknownVoice)
+  const [message, setMessage] = useState("Hello there, how can I help you today? What is the purpose of your visit?");
   const GusterId = useRecoilValue(gustId)
   const res = new SpeechSynthesisUtterance("hello there how can i help you today What is the purpose of visit?");
 
@@ -48,6 +51,15 @@ function Talk() {
   //     });
 
   // }, [])
+
+
+
+
+ 
+
+
+
+
   useEffect(()=>{
 
     console.log("+++++"+GusterId);
@@ -99,8 +111,16 @@ function Talk() {
   
           if (DisplayUserName === "Unknown") {
             console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-            navigate("/Responce");
-            textToSpeach("Hello there, how can I help you today? What is the purpose of your visit?");
+          
+              // if (DisplayUserName === "Unknown") {
+              //   console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+              //   navigate("/Responce");
+              //   setTimeout(() => {
+              //     const speech = new SpeechSynthesisUtterance("Hello there, how can I help you today? What is the purpose of your visit?");
+              //     window.speechSynthesis.speak(speech);
+              //   }, 500);
+              // }
+        
           } else {
             if (DisplayUserName) {
               textToSpeach("Hello " + DisplayUserName);
@@ -142,6 +162,7 @@ function Talk() {
       const jsonData = JSON.parse(data);
       const { user } = jsonData;
       console.log("User******", user);
+      setDisplatName(user.display_name)
   
       if (user.user === "Unknown") {
         displayNameTrigger("Unknown");
@@ -222,11 +243,11 @@ function Talk() {
 
         if (DisplatName === "Unknown") {
           console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+          setUnk("Unknown")
           // window.speechSynthesis.speak(responce);
           navigate("/Responce");
 
           // window.speechSynthesis.speak(res);
-          textToSpeach("hello there how can i help you today What is the purpose of visit?")
         } else {
        
 
@@ -249,7 +270,39 @@ function Talk() {
  
   }, [DisplatName]);
 
+  useEffect(() => {
+    let speakMessage = null;
 
+    const speakAndNavigate = async () => {
+      if (DisplatName === "Unknown") {
+        console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$+++++++++++++++");
+        setUnk("Unknown")
+        navigate("/Response");
+        // speakMessage = new SpeechSynthesisUtterance(message);
+        // window.speechSynthesis.speak(speakMessage);
+        // setSpeechSpoken(true); // Mark speech as spoken
+      }
+    };
+
+    // speakAndNavigate();
+
+    // // Cleanup function to cancel speech if needed
+    // return () => {
+    //   if (speakMessage) {
+    //     window.speechSynthesis.cancel();
+    //   }
+    // };
+  }, [DisplatName]);
+
+
+    // Check if speech synthesis is supported by the browser
+
+ useEffect(()=>{
+
+  console.log("Unsupported +++++++++++++++++++_____________",Unk)
+
+ },[Unk])
+ 
 
   // const Logo = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.4&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1ym1';
   // const User = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.3&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1yt3';

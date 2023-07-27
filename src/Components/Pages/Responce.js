@@ -23,6 +23,7 @@ import {
   PorposeOfVisit,
   VoicePass,
   gustId,
+  UnknownVoice,
 } from "../../Recoil/recoil";
 import { Icon } from "@iconify/react";
 import MovingText from "react-moving-text";
@@ -107,9 +108,37 @@ function Responce() {
   const [userNameConfirmation, setUserNameConfirmation] = useState(false);
   const [nameConformation, setNameConformation] = useState(false);
   const  [MeetPending , setMeetPending] = useState(false);
+  const [speechSpoken, setSpeechSpoken] = useState(false);
+
+ const  UnPersone = useRecoilValue(UnknownVoice)
 
 
+ 
 
+
+ useEffect(() => {
+  let speakMessage = null;
+
+  const speakAndNavigate = async () => {
+    speakMessage = new SpeechSynthesisUtterance("Hello there, how can I help you today? What is the purpose of your visit?");
+    const message = "Hello there, how can I help you today? What is the purpose of your visit?";
+    if(UnPersone === "Unknown") {   
+         console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$+++++++++++++++",UnPersone);
+    
+      window.speechSynthesis.speak(speakMessage);
+      setSpeechSpoken(true); // Mark speech as spoken
+    }
+  };
+
+  speakAndNavigate();
+
+  // Cleanup function to cancel speech if needed
+  return () => {
+    if (speakMessage) {
+      window.speechSynthesis.cancel();
+    }
+  };
+}, [speechSpoken]);
 
 
   useSnackbar(options)

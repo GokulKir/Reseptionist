@@ -53,3 +53,8 @@ export const VoicePass = atom({
   key : "VoicePass",
   default : false
 })
+
+export const UnknownVoice = atom({
+  key : "UnknownVoice",
+  default:''
+})
