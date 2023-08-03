@@ -94,7 +94,6 @@ function Responce() {
   const [ta, setTa] = useState("meet a");
   const navigate = useNavigate();
   const [DisplayName, setDisplayName] = useState(null);
-  const speech = new Speech();
   const id = useId();
   const [data, setData] = useState();
   const [OnetimeSpeak, setOnetimeSpeak] = useState(true);
@@ -201,6 +200,9 @@ function Responce() {
       ) {
         AlertBox();
         setgivenName(foundUser?.display_name);
+
+      const confirmed = new SpeechSynthesisUtterance("Condacting" + foundUser.display_name);
+      window.speechSynthesis.speak(confirmed);
         // console.log("Matched userData", display_name);
       }
     }
@@ -209,6 +211,8 @@ function Responce() {
   useEffect(() => {
     console.log(listUsers, "listUsers");
   }, [listUsers]);
+
+
 
   useEffect(() => {
     if (DisplayName?.display_name) {
@@ -219,7 +223,7 @@ function Responce() {
   }, [DisplayName]);
 
   const MeetaPerson = () => {
-    AlertBox();
+ 
     setSelection(0);
   };
 
@@ -251,7 +255,6 @@ function Responce() {
 
 
   const AlertBox = () => {
-    if (givenName === Talk) {
       Swal.fire({
         title: "Confirm",
         text: `Let me confirm, so you are here to meet ${givenName}`,
@@ -276,8 +279,8 @@ function Responce() {
           navigate("/NotRes");
         }
       });
-    }
   };
+
 
 
   const Assist = async () => {
@@ -285,7 +288,6 @@ function Responce() {
     console.log("This is voice" + transcript);
     setTalk(transcript);
   };
-  
 
   const {
     transcript,
@@ -303,7 +305,6 @@ function Responce() {
     text: "This is a alert message",
     show: false,
   });
-
   function onCloseAlert() {
     setAlert({
       type: "",
@@ -311,7 +312,6 @@ function Responce() {
       show: false,
     });
   }
-
   function onShowAlert(type) {
     setAlert({
       type: type,
@@ -427,11 +427,7 @@ function Responce() {
     const text = "meet";
     let oneTimeAlertData = true;
 
-    if (
-      transcript === text ||
-      text.includes("please meet a person") ||
-      text.includes("please shedule a meeting") ||
-      text.includes("please shedule a meet")
+    if ( text || text.includes("please meet a person") || text.includes("please shedule a meeting") || text.includes("please shedule a meet") || text.includes('shedule a meet') || text.includes('shedule a meet') || text.includes('shedule meet')
     ) {
       console.log("Meet sheduled");
       const confirmed = new SpeechSynthesisUtterance(condition);
@@ -450,20 +446,12 @@ function Responce() {
     }
   }, []);
 
-  useEffect(() => {
-    console.log("User given name" + givenName);
 
-    if (Talk === givenName) {
-      const confirmed = new SpeechSynthesisUtterance("Hello" + givenName);
-      window.speechSynthesis.speak(confirmed);
-
-      AlertBox();
-    }
-  }, []);
 
   useEffect(() => {
     startListening();
   }, [startListening]);
+
 
   // useEffect(() => {
   //   console.log("This id");
@@ -716,9 +704,13 @@ function Responce() {
   };
   return (
     <div>
+
+
       <div className="bg-white-500 w-full h-[80px]">
         <div className="ml-[26px] mt-[15px] bg">
           <img className="w-[130px]  md:w-[160px] lg:w-[180px]" src={Logo} />
+          <Say speak="A quick brown fox jumped over the lazy dogs." />
+
         </div>
       </div>
 
@@ -731,6 +723,7 @@ function Responce() {
         </div>
 
         <div className="mt-[17px] ml-[0px] md:ml-[30px] md:mt-[21px] lg:mt-[29px] lg:ml-[60px] sm:ml-[10px]  ">
+ 
           <MovingText
             className="font-light text-[18px] md:text-[29px]"
             type="slideInFromBottom"
@@ -752,9 +745,12 @@ function Responce() {
           <p>{Talk}</p>
         </div>
       </div>
+
+
+
       <div className="w-full h-[80px] bg-white-700 mt-[20px] md:mt-[60px] lg:mt-[120px] flex-row left-5 right-5 ">
         <div className=" flex  space-x-4 md:space-x-12  lg:space-x-10] ">
-          <div className="w-[1px] md:w-2 lg:w-5 lg:table-fixed flex   "></div>
+          <div className="w-[1px] md:w-2 lg:w-5 lg: flex   "></div>
           <Button
             onClick={() => setEmselection(true)}
             className="w-[130px] h-[38px] md:w-[250px] md:h-[60px] lg:w-[290px] lg:h-[65px] bg-orange-600  content-center "

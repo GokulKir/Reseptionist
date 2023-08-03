@@ -55,7 +55,6 @@ function Talk() {
 
 
 
- 
 
 
 
@@ -154,6 +153,7 @@ function Talk() {
   //   });
   // }, []);
 
+
   useEffect(() => {
     console.log("Setting up socket event listener...");
   
@@ -181,6 +181,10 @@ function Talk() {
   }, []);
   
   
+
+
+
+
 
 
 
@@ -212,6 +216,25 @@ function Talk() {
       if (!(DisplatName === "Unknown")) {
         window.speechSynthesis.speak(responce);
       }
+      //   let responce = new SpeechSynthesisUtterance("Hello" + DisplatName);
+      const textToSpeach = (data) => {
+        const speech = new Speech();
+
+        console.log("====================================");
+        console.log("im in with 😮", data);
+        console.log("====================================");
+        const speakAfterDelay = () => {
+          setTimeout(() => {
+            speech.speak({
+              text: data,
+            });
+          }, 5000);
+        };
+
+        speech.init().then(() => {
+          speakAfterDelay();
+        });
+
 
       if (DisplatName === "Unknown") {
       
@@ -264,6 +287,26 @@ function Talk() {
 
         //   setDisplatName(null);
       }
+
+        // Cleanup function
+        return () => {
+          speech.cancel();
+        };
+      };
+
+      if (DisplatName === "Unknown") {
+        // window.speechSynthesis.speak(responce);
+        navigate("/responce");
+      } else {
+        if (DisplatName) {
+          textToSpeach("Hello" + DisplatName);
+        }
+        // window.speechSynthesis.speak(responce);
+      }
+      //   new SpeechSynthesisUtterance("");
+
+      //   setDisplatName(null);
+
     } catch (error) {
       console.log(error.message);
     }
@@ -293,10 +336,6 @@ function Talk() {
     //   }
     // };
   }, [DisplatName]);
-
-
-    // Check if speech synthesis is supported by the browser
-
  useEffect(()=>{
 
   console.log("Unsupported +++++++++++++++++++_____________",Unk)
@@ -305,6 +344,20 @@ function Talk() {
  
 
   // const Logo = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.4&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1ym1';
+
+  // const Logo = 'https  // useEffect(() => {
+  // socket.on('message',(data)=>{
+  //  console.log(data,"socket data");
+  //   const jsonData = JSON.parse(data);
+  //   console.log("JSON data", jsonData);
+  //   const { user, allUser } = jsonData;
+
+  //   const message = new SpeechSynthesisUtterance(user.display_name);
+  //   window.speechSynthesis.speak();
+  //     });
+
+  // }, [])://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.4&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1ym1';
+
   // const User = 'https://mail.google.com/mail/u/0?ui=2&ik=7fe5f027a2&attid=0.3&permmsgid=msg-f:1769128226806473374&th=188d34bfc0eaa29e&view=att&disp=safe&realattid=f_lj2ql1yt3';
 
   const {
