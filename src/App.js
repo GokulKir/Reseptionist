@@ -20,11 +20,11 @@ import SnackbarProvider from 'react-simple-snackbar'
 import React from 'react'
 // const URL = process.env.PORT === 'production' ? undefined : 'http://localhost:5000';
 
-// const SocketURL = 'https://hubo3.domainenroll.com'
-// <<<<<<< newBugBranch
+
+
 // // const SocketURL = "http://localhost:3000";
 // const SocketURL = "https://hubo4.domainenroll.com/";
-// =======
+
 const SocketURL = "https://hubo4.domainenroll.com";
 // const SocketURL = "https://hubo4.domainenroll.com/";
 

@@ -21,6 +21,9 @@ import {
   Question,
   ListUsers,
   PorposeOfVisit,
+  VoicePass,
+  gustId,
+  UnknownVoice,
 } from "../../Recoil/recoil";
 import { Icon } from "@iconify/react";
 import MovingText from "react-moving-text";
@@ -60,6 +63,16 @@ function Responce() {
   const [purposeOfVisit, setPorposeOfVisit] = useRecoilState(PorposeOfVisit);
   const purposeOfVisitValue = useRecoilValue(PorposeOfVisit);
 
+  const GusterId = useRecoilValue(gustId)
+
+  useEffect(()=>{
+
+    console.log("Data>>>>>>>>>>>>> This is Data",gustId);
+
+  },[])
+
+  const PassVoice = useRecoilState(VoicePass);
+
 
   const options = {
     position: 'top-center',
@@ -93,10 +106,38 @@ function Responce() {
   const [userdisplayName, setUserdisplayName] = useState("");
   const [userNameConfirmation, setUserNameConfirmation] = useState(false);
   const [nameConformation, setNameConformation] = useState(false);
-  const [openSnackbar, closeSnackbar] = useSnackbar(options)
- const  [MeetPending , setMeetPending] = useState(false);
+  const  [MeetPending , setMeetPending] = useState(false);
+  const [speechSpoken, setSpeechSpoken] = useState(false);
+
+ const  UnPersone = useRecoilValue(UnknownVoice)
 
 
+ 
+
+
+ useEffect(() => {
+  let speakMessage = null;
+
+  const speakAndNavigate = async () => {
+    speakMessage = new SpeechSynthesisUtterance("Hello there, how can I help you today? What is the purpose of your visit?");
+    const message = "Hello there, how can I help you today? What is the purpose of your visit?";
+    if(UnPersone === "Unknown") {   
+         console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$+++++++++++++++",UnPersone);
+    
+      window.speechSynthesis.speak(speakMessage);
+      setSpeechSpoken(true); // Mark speech as spoken
+    }
+  };
+
+  speakAndNavigate();
+
+  // Cleanup function to cancel speech if needed
+  return () => {
+    if (speakMessage) {
+      window.speechSynthesis.cancel();
+    }
+  };
+}, [speechSpoken]);
 
 
   useSnackbar(options)
@@ -210,6 +251,9 @@ function Responce() {
     }
   };
 
+
+
+
   const AlertBox = () => {
       Swal.fire({
         title: "Confirm",
@@ -239,13 +283,12 @@ function Responce() {
 
 
 
-
-
   const Assist = async () => {
     await SpeechRecognition.startListening();
     console.log("This is voice" + transcript);
     setTalk(transcript);
   };
+
   const {
     transcript,
     interimTranscript,
@@ -335,11 +378,9 @@ function Responce() {
 
       let nameNotRecognized = setTimeout(() => {
         if (!nameConformation) {
-        
-          openSnackbar("Name is not recognized")
           setMeetPending(true)
         }
-      }, 20000);
+      }, 50000);
       if (nameConformation) {
         clearTimeout(nameNotRecognized);
       }
@@ -358,38 +399,21 @@ function Responce() {
     }
   }, [userdisplayName]);
 
-  const ResponceFunction = () => {
-
- 
-      if (nameTranscribe.toLowerCase().includes("yes")) {
-        navigate("/contactform");
-        setNameConformation(true);
-        setEmployeeDetails(userData);
-      }
-      if (nameTranscribe.toLowerCase().includes === "No") {
-        navigate("/NotRes");
-      }
-      // setUserNameConfirmation(false)
-    
-
-  }
 
   useEffect(() => {
-    // if (userNameConfirmation) {
-    //   if (nameTranscribe.toLowerCase().includes("yes")) {
-    //     navigate("/contactform");
-    //     setNameConformation(true);
-    //     setEmployeeDetails(userData);
-    //   }
-    //   if (nameTranscribe.toLowerCase().includes === "No") {
-    //     navigate("/NotRes");
-    //   }
-    //   // setUserNameConfirmation(false)
-    // }
     if (userNameConfirmation) {
-
-    ResponceFunction()
+      if (nameTranscribe.toLowerCase().includes("yes")) {
+        navigate("/contactform");
+        setNameConformation(false);
+        setEmployeeDetails(userData);
+      }
+      if (nameTranscribe.toLowerCase().includes("no")) {
+        setMeetPending(true)
+        // navigate("/NotRes");
+      }
+      // setUserNameConfirmation(false)
     }
+
   }, [userNameConfirmation, nameTranscribe]);
 
 
@@ -454,10 +478,53 @@ function Responce() {
   //   }
   // }, []);
 
+  useEffect(()=>{
+    if(MeetPending === true) {
+
+      if (nameTranscribe.toLowerCase().includes("ok")) {
+             navigate('/NotRes')
+      }
+
+    }
+  },[MeetPending, nameTranscribe])
+
+
+
+  useEffect(() => {
+    if(PassVoice === true) {
+
+      console.log("VoiceData+++++++++"+PassVoice);
+    const speak = () => {
+     
+      const speech = new SpeechSynthesisUtterance();
+
+      speech.text = 'Hello there how can i help you today , What is the purpose of visit?';
+      speech.volume = 1;
+      speech.rate = 1;
+      speech.pitch = 1;
+
+      window.speechSynthesis.speak(speech);
+    };
+
+    const timeoutId = setTimeout(speak, 8000);
+
+    return () => {
+      clearTimeout(timeoutId); 
+    };
+  }
+  }, []);
+
 
   const NavigateMeet = () => {
     navigate('/NotRes')
     setMeetPending(false)
+  }
+
+  const yes = () => {
+
+    navigate("/contactform");
+    setEmselection(false)
+  
   }
 
 
@@ -604,7 +671,7 @@ function Responce() {
             {userNameConfirmation && (
               <div className="flex justify-between mt-[30px]">
                 <Button
-                  onClick={() => setEmselection(false)}
+                  onClick={() => yes()}
                   text="Cancel"
                   className="w-[120px] h-[41px] flex  border-2   border-orange-600 content-center justify-center "
                 >
